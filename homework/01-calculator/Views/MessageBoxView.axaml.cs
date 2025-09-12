@@ -5,7 +5,7 @@ using Avalonia.Markup.Xaml;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
 
-namespace _01_calculator;
+namespace _01_calculator.Views;
 
 public partial class MessageBoxView : UserControl
 {
@@ -15,13 +15,9 @@ public partial class MessageBoxView : UserControl
     }
     private async void OnLaunchMessageBoxClick(object? sender, RoutedEventArgs e)
     {
-        var box = MessageBoxManager.GetMessageBoxStandard("Information",
-            "This is a simple message box!",
+        var box = MessageBoxManager.GetMessageBoxStandard("Error",
+            "Error: Cannot divide by zero!",
             ButtonEnum.Ok);
-
-        // ShowAsync displays the message box, choosing the presentation style—popup or window—according to the application type:
-        // - SingleViewApplicationLifetime (used in mobile or browser environments): shows as a popup
-        // - ClassicDesktopStyleApplicationLifetime (desktop apps): shows as a window
         await box.ShowAsync();
     }
 }

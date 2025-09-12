@@ -6,9 +6,15 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="_01_calculator.Views.CalculatorView"
              x:DataType="vm:CalculatorViewModel">
-   <StackPanel>
-       <TextBlock Text="{Binding DisplayText}" />       
-       <Grid ColumnDefinitions="Auto, Auto, Auto, Auto, *" RowDefinitions="Auto, Auto, Auto, Auto, Auto, *">
+    <UserControl.Styles>
+        <Style Selector="Button">
+            <Setter Property="Padding" Value="10" />
+            <Setter Property="Margin" Value="5" />
+        </Style>
+    </UserControl.Styles>
+    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+       <TextBlock Margin="10"  Text="{Binding DisplayText}" />  
+       <Grid ColumnDefinitions="Auto, Auto, Auto, Auto, *" RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto, *">
            <Button Grid.Row="0" Grid.Column="0" Command="{Binding AppendCommand}" CommandParameter="7">7</Button>
            <Button Grid.Row="0" Grid.Column="1" Command="{Binding AppendCommand}" CommandParameter="8">8</Button>
            <Button Grid.Row="0" Grid.Column="2" Command="{Binding AppendCommand}" CommandParameter="9">9</Button>
@@ -28,6 +34,10 @@
            <Button Grid.Row="3" Grid.Column="1" Command="{Binding ClearCommand}">C</Button>
            <Button Grid.Row="3" Grid.Column="2" Command="{Binding AppendCommand}" CommandParameter="+">+</Button>
            <Button Grid.Row="3" Grid.Column="3" Command="{Binding CalculateCommand}">=</Button>
+           
+           <Button Grid.Row="4" Grid.Column="0" Command="{Binding StoreCommand}" CommandParameter="0">MS</Button>
+           <Button Grid.Row="4" Grid.Column="1" Command="{Binding RecallCommand}" CommandParameter="+">MR</Button>
+           <Button Grid.Row="4" Grid.Column="2" Command="{Binding ClearMemoryCommand}">MC</Button>
        </Grid>
    </StackPanel>
 </UserControl>

@@ -1,17 +1,25 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using MsBox.Avalonia;
+using MsBox.Avalonia.Enums;
 
 namespace _01_calculator.ViewModels;
 
 public partial class CalculatorViewModel : ViewModelBase
 {
-    [ObservableProperty] private string displayText = "[ Display Area ]";
+    private const string DISPLAY_EMPTY = "[ Display Area ]";
+    [ObservableProperty] private string displayText = DISPLAY_EMPTY;
+    private string memory = "";
+
     
     [RelayCommand]
     private void Append(string value)
     {
-        if (DisplayText[0] == '[')
+        if (DisplayText == DISPLAY_EMPTY)
         {
             DisplayText = "";
         }
@@ -21,41 +29,99 @@ public partial class CalculatorViewModel : ViewModelBase
     [RelayCommand]
     private void Clear()
     {
-        DisplayText = "[ Display Area ]";
+        DisplayText = DISPLAY_EMPTY;
     }
 
     [RelayCommand]
-    private void Calculate()
+    private void Store()
+    {
+        memory = DisplayText;
+    }
+
+    [RelayCommand]
+    private void Recall()
+    {
+        DisplayText += memory;
+    }
+    
+    [RelayCommand]
+    private void ClearMemory()
+    {
+        memory = "";
+    }
+
+    [RelayCommand]
+    private async Task Calculate()
     {
         var result = 0;
-
-        if (DisplayText.Length == 1)
+        if (!DisplayText.Any(c => "+-*/".Contains(c)))
         {
-            result = DisplayText[0];
+            result = int.Parse(DisplayText);
+            DisplayText = result.ToString();
+            return;
         }
-        else
+
+        var numbers = new List<int>();
+        var operators = new List<char>();
+        var currentNumber = "";
+        var isPositive = true;
+
+        for (var i = 0; i < DisplayText.Length; i++)
         {
-            for (var i = 0; i < DisplayText.Length; i += 3)
+            var c = DisplayText[i];
+            if (i == 0 && c == '-')
             {
-                if (DisplayText[i + 2] - '0' == 0 && DisplayText[i + 1] == '/')
-                {
-                    
-                }
-                result += CalculateExpression(DisplayText[i] - '0', DisplayText[i + 2] - '0', DisplayText[i + 1]);
+                isPositive = false;
+            }
+            else if ("+*/-".Contains(c) && !string.IsNullOrEmpty(currentNumber))
+            {
+                numbers.Add(int.Parse(isPositive ? currentNumber : "-" + currentNumber));
+                isPositive = true;
+                operators.Add(c);
+                currentNumber = "";
+            }
+            else if (char.IsDigit(c))
+            {
+                currentNumber += c;
+            }
+        }
+
+        if (!string.IsNullOrEmpty(currentNumber))
+        {
+            numbers.Add(int.Parse(currentNumber));
+        }
+
+        result = numbers[0];
+
+        for (var i = 0; i < operators.Count && i + 1 < numbers.Count; i++)
+        {
+            var nextNumber = numbers[i + 1];
+            var op = operators[i];
+            
+            if (nextNumber == 0 && op == '/')
+            {
+                var box = MessageBoxManager
+                    .GetMessageBoxStandard("Caption", "Are you sure you would like to delete appender_replace_page_1?",
+                        ButtonEnum.YesNo);
+                var message = await box.ShowAsync();
+                DisplayText = DISPLAY_EMPTY;
+            }
+            switch (op)
+            {
+                case '+':
+                    result += nextNumber;
+                    break;
+                case '-':
+                    result -= nextNumber;
+                    break;
+                case '*':
+                    result *= nextNumber;
+                    break;
+                case '/':
+                    result /= nextNumber;
+                    break;
             }
         }
         DisplayText = result.ToString();
-    }
-
-    private static int CalculateExpression(int nr1, int nr2, char selectedOperator)
-    {
-        return selectedOperator switch
-        {
-            '+' => nr1 + nr2,
-            '-' => nr1 - nr2,
-            '*' => nr1 * nr2,
-            '/' => nr1 / nr2,
-            _ => throw new InvalidOperationException()
-        };
     }
 }
