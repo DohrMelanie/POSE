@@ -1,0 +1,126 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             xmlns:vm="using:_2025_09_12_Avalonia.ViewModels"
+             x:DataType="vm:CalculatorViewModel"
+             x:Class="_2025_09_12_Avalonia.Views.CalculatorView">
+    
+    <UserControl.Styles>
+        <!-- Main container style -->
+        <Style Selector="Border.calculator-container">
+            <Setter Property="Background" Value="#F8F9FA" />
+            <Setter Property="CornerRadius" Value="12" />
+            <Setter Property="Padding" Value="24" />
+            <Setter Property="BoxShadow" Value="0 4 16 0 #1A000000" />
+            <Setter Property="Margin" Value="20" />
+        </Style>
+        
+        <!-- Label text blocks -->
+        <Style Selector="TextBlock.field-label">
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="#495057" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+        
+        <!-- Input controls -->
+        <Style Selector="NumericUpDown.calculator-input">
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="FontSize" Value="14" />
+        </Style>
+        
+        <Style Selector="ComboBox.calculator-input">
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="FontSize" Value="14" />
+        </Style>
+        
+        <!-- Calculate button -->
+        <Style Selector="Button.calculate-button">
+            <Setter Property="Background" Value="#007ACC" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Padding" Value="12,10" />
+            <Setter Property="Margin" Value="0,8,0,0" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="FontSize" Value="16" />
+        </Style>
+        
+        <Style Selector="Button.calculate-button:pointerover">
+            <Setter Property="Background" Value="#106EBE" />
+        </Style>
+        
+        <Style Selector="Button.calculate-button:pressed">
+            <Setter Property="Background" Value="#005A9E" />
+        </Style>
+        
+        <!-- Result display -->
+        <Style Selector="Border.result-container">
+            <Setter Property="Background" Value="#E8F4FD" />
+            <Setter Property="BorderBrush" Value="#B3D9F2" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="Padding" Value="16,12" />
+            <Setter Property="Margin" Value="0,8,0,0" />
+        </Style>
+        
+        <Style Selector="TextBlock.result-label">
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="#0F5132" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+        
+        <Style Selector="TextBlock.result-value">
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="FontSize" Value="18" />
+            <Setter Property="Foreground" Value="#0F5132" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+    </UserControl.Styles>
+    
+    <Border Classes="calculator-container">
+        <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,*" 
+              ColumnDefinitions="120,*" 
+              RowSpacing="16" 
+              ColumnSpacing="12">
+            
+            <TextBlock Grid.Row="0" Grid.Column="0" 
+                       Text="First Number:" 
+                       Classes="field-label" />
+            <NumericUpDown Grid.Row="0" Grid.Column="1" 
+                           Value="{Binding FirstNumber}"
+                           Classes="calculator-input" />
+
+            <TextBlock Grid.Row="1" Grid.Column="0" 
+                       Text="Second Number:" 
+                       Classes="field-label" />
+            <NumericUpDown Grid.Row="1" Grid.Column="1" 
+                           Value="{Binding SecondNumber}"
+                           Classes="calculator-input" />
+
+            <TextBlock Grid.Row="2" Grid.Column="0" 
+                       Text="Operation:" 
+                       Classes="field-label" />
+            <ComboBox Grid.Row="2" Grid.Column="1" 
+                      ItemsSource="{Binding Operators}" 
+                      SelectedItem="{Binding SelectedOperator}"
+                      Classes="calculator-input" />
+
+            <Button Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2"
+                    Command="{Binding CalculateCommand}"
+                    Classes="calculate-button">
+                Calculate Result
+            </Button>
+
+            <Border Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2"
+                    Classes="result-container">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="Result:" 
+                               Classes="result-label" />
+                    <TextBlock Text="{Binding Result}" 
+                               Classes="result-value" />
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Border>
+</UserControl>

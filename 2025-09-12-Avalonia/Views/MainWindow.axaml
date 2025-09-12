@@ -24,13 +24,14 @@
             </MenuItem>
         </Menu>
         <Button VerticalAlignment="Stretch">Test</Button>
-        <TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
         <TabControl>
-            <TabItem Header="Hallo">
+            <TabItem Header="Messagebox">
                 <views1:MessageBoxView/>
             </TabItem>
             
-            <TabItem Header="Welt"/>
+            <TabItem Header="Calculator">
+                <views1:CalculatorView/>
+            </TabItem>s
         </TabControl>
     </DockPanel>
 </Window>
