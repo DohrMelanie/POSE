@@ -5,3 +5,10 @@ Dependency Injection - Warum?
 - Anlegen von Database Context viel Code, bei CDI muss es dann nur einmal gemacht werden
 
 - bei Console App und Avalonia standardmäßig nicht da wie bei .NET
+
+in App.axaml.cs wird Fenster angelegt
+da DI anlegen
+
+Commands:
+dotnet new avalonia.mvvm
+dotnet add package Microsoft.Extensions.DependencyInjection // bei LF in StarterCode
