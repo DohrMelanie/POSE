@@ -1,0 +1,7 @@
+Prog - Mitschrift; von Melanie Dohr; am 26.09.2025
+
+Dependency Injection - Warum?
+- Interface mit konkreter Implementierung dadurch verbunden (dann Mocken für Unit-Tests)
+- Anlegen von Database Context viel Code, bei CDI muss es dann nur einmal gemacht werden
+
+- bei Console App und Avalonia standardmäßig nicht da wie bei .NET
