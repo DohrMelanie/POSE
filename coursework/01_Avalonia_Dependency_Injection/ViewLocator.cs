@@ -5,7 +5,7 @@ using _01_Avalonia_Dependency_Injection.ViewModels;
 
 namespace _01_Avalonia_Dependency_Injection;
 
-public class ViewLocator : IDataTemplate
+public class ViewLocator : IDataTemplate // sucht automatisch zu TodoListViewModel die TodoListView
 {
 
     public Control? Build(object? param)

@@ -1,3 +1,5 @@
+using System.Collections.ObjectModel;
+using _01_Avalonia_Dependency_Injection.ViewModels;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
@@ -9,5 +11,10 @@ public partial class TodoListView : UserControl
     public TodoListView()
     {
         InitializeComponent();
+    }
+
+    public TodoListView(TodoListViewModel viewModel) : this()
+    {
+        DataContext = viewModel;
     }
 }

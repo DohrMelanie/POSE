@@ -28,6 +28,8 @@ public partial class App : Application
             var collection = new ServiceCollection();
             collection.AddTransient<MainWindowViewModel>(); // wie builder.addServices in .NET
             collection.AddTransient<MainWindow>(); // Transient = jedes mal neu, bei GUI egal
+            collection.AddTransient<TodoListView>();
+            collection.AddTransient<TodoListViewModel>(); // Reihenfolge ist egal
             // AddDbContext muss man machen! in DI factory geben, jedes Fenster bekommt dann neue Instanz von DbContext, deshalb factory veröffentlichen
             // Db Context nicht als Transient weil anlegen aufwendig -> bei DI kann man mehr entscheiden als nur new + Exceptionhandling möglich
             // ... add additional services if necessary

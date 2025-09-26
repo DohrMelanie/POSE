@@ -1,8 +1,31 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:vm="using:_01_Avalonia_Dependency_Injection.ViewModels"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="vm:TodoListViewModel"
              x:Class="_01_Avalonia_Dependency_Injection.Views.TodoListView">
-  Welcome to Avalonia!
+    <ScrollViewer> 
+        <StackPanel Orientation="Vertical">
+        <TextBlock Text="Title: "/>
+        <TextBox Margin="10" Text="{Binding CurrentTitle}"></TextBox>
+        <Button Command="{Binding AddItem}">Add Item</Button>
+            <ListBox ItemsSource="{Binding Items}">
+                <ItemsControl.DataTemplates>
+                    <DataTemplate x:DataType="vm:TodoItem">
+                        <StackPanel Orientation="Horizontal">
+                            <CheckBox IsChecked="{Binding IsDone}" Margin="0,0,8,0"/>
+                            <TextBlock Text="{Binding Title}"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.DataTemplates>
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ListBox>
+        </StackPanel>
+    </ScrollViewer>
 </UserControl>

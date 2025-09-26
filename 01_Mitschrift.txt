@@ -9,6 +9,19 @@ Dependency Injection - Warum?
 in App.axaml.cs wird Fenster angelegt
 da DI anlegen
 
+Namespaces in View muss passsen
+InitializeComponent nicht findbar -> kann an Rider liegen
+
+Avalonia: Für Zeug anzeigen - Control
+
+bei LF: so simpel wie in Übung inkl. ItemsPanel, WrapPanelx, ItemsControl,
+
+Bei HÜ:
+Genereller Aufbau: Stackpanel?
+ItemsControl + WrapPanel für das links + Buttons
+rechts: DataGrid
+
 Commands:
 dotnet new avalonia.mvvm
 dotnet add package Microsoft.Extensions.DependencyInjection // bei LF in StarterCode
+dotnet new avalonia.usercontrol -n TodoListView

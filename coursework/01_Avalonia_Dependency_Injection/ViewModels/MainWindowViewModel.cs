@@ -1,5 +1,8 @@
-﻿namespace _01_Avalonia_Dependency_Injection.ViewModels;
+﻿using _01_Avalonia_Dependency_Injection.Views;
 
-public partial class MainWindowViewModel : ViewModelBase
+namespace _01_Avalonia_Dependency_Injection.ViewModels;
+
+public class MainWindowViewModel(TodoListViewModel todoListViewModel) : ViewModelBase
 {
+    public TodoListViewModel TodoListViewModel { get;  } = todoListViewModel;
 }

@@ -18,7 +18,8 @@
     
     <TabControl>
         <TabItem Header="Todo List">
-            <views:TodoListView/>
+            <ContentControl Content="{Binding TodoListViewModel}"/>
+            <!--<views:TodoListView/>  wieder kein DI, deshalb über ViewLocator-->
         </TabItem>
     </TabControl>
 
