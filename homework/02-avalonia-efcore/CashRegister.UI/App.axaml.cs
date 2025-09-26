@@ -41,6 +41,7 @@ public partial class App : Application
             collection.AddSingleton<IConfiguration>(configuration);
             collection.AddTransient<MainWindow>();
             collection.AddTransient<MainWindowViewModel>();
+            
             collection.AddDbContextFactory<ApplicationDataContext>(options =>
                 options.UseSqlite(configuration.GetConnectionString("CashRegister")));
             var services = collection.BuildServiceProvider();
