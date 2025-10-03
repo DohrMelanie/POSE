@@ -3,6 +3,7 @@
         xmlns:vm="using:CashRegister.UI.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:data="clr-namespace:CashRegister.Data;assembly=CashRegister.Data"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="CashRegister.UI.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
@@ -16,11 +17,27 @@
     </Design.DataContext>
 
     <!-- Some code to demonstrate how to access the DB -->
-    <StackPanel>
-        <Button Command="{Binding AddSampleDataCommand}">Add Sample Data</Button>
-        <Button Command="{Binding GetFirstSampleRowCommand}">Load Data</Button>
-    </StackPanel>
-
+    <Grid ColumnDefinitions="Auto, Auto,*" RowDefinitions="Auto, *">
+        <ItemsControl Grid.Row="0" Grid.Column="0" ItemsSource="{Binding Items}">
+            <ItemsControl.DataTemplates>
+                <DataTemplate x:DataType="data:Item">
+                    <StackPanel Orientation="Horizontal" Margin="10">
+                        <TextBlock Text="{Binding Name}" Margin="0,0,5,0"></TextBlock>
+                        <TextBlock Text="{Binding Amount}"></TextBlock>
+                        <TextBlock Text="{Binding AmountName}"></TextBlock>
+                    </StackPanel>
+                </DataTemplate>
+            </ItemsControl.DataTemplates>
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel Orientation="Horizontal"/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+        </ItemsControl>
+        <StackPanel Grid.Row="0" Grid.Column="1">
+        </StackPanel>
+    </Grid>
+    
     <!--
     Tips for UI:
     - Use a Grid as the main layout container

@@ -7,7 +7,9 @@ namespace CashRegister.Data;
 public partial class ApplicationDataContext(DbContextOptions<ApplicationDataContext> options)
     : DbContext(options)
 {
-    public DbSet<Greeting> Greetings => Set<Greeting>();
+    public  DbSet<Item> Items { get; set; }
+    public DbSet<Receipt> Receipts { get; set; }
+    public DbSet<ReceiptLine> ReceiptLines { get; set; }
 }
 
 public class ApplicationDataContextFactory : IDesignTimeDbContextFactory<ApplicationDataContext>
