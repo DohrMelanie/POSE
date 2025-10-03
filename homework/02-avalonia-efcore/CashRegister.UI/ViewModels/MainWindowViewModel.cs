@@ -5,8 +5,6 @@ using CashRegister.Data;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.EntityFrameworkCore;
-using MsBox.Avalonia;
-using MsBox.Avalonia.Enums;
 
 namespace CashRegister.UI.ViewModels;
 
@@ -14,9 +12,16 @@ public partial class MainWindowViewModel: ViewModelBase
 {
     private readonly ApplicationDataContext dbContext;
     [ObservableProperty] private ObservableCollection<Item> items = [];
+    [ObservableProperty] private ObservableCollection<ReceiptLine> receiptLines = [];
+    [ObservableProperty] private decimal sumOfReceipt = 0;
 
     public MainWindowViewModel(IDbContextFactory<ApplicationDataContext> contextFactory) {
         dbContext = contextFactory.CreateDbContext();
+        AddInitialData();
+    }
+
+    private async Task AddInitialData()
+    {
         if (!dbContext.Items.Any())
         {
             dbContext.Items.Add(new Item() { Name = "Bananen", Price = 1.99m, Amount = 1, AmountName = "kg" });
@@ -29,28 +34,42 @@ public partial class MainWindowViewModel: ViewModelBase
             dbContext.Items.Add(new Item() { Name = "Knoblauch", Price = 0.99m, Amount = 1, AmountName = " Stück" });
             dbContext.Items.Add(new Item() { Name = "Joghurt", Price = 0.49m, Amount = 200, AmountName = "g" });
             dbContext.Items.Add(new Item() { Name = "Butter", Price = 1.49m });
-            dbContext.SaveChanges();
+            await dbContext.SaveChangesAsync();
         }
-        foreach (var item in dbContext.Items)
+
+        foreach (var item in await dbContext.Items.ToListAsync())
         {
             Items.Add(item);
         }
     }
+    
     [RelayCommand]
-    private async Task AddItem()
+    public async Task AddItemToReceiptCommand(Item item)
     {
+        if (ReceiptLines.Any(l => l.ItemId == item.Id))
+        {
+            var line = ReceiptLines.First(l => l.ItemId == item.Id);
+            line.Quantity++;
+            line.TotalPrice = line.Quantity * item.Price;
+        }
+        else
+        {
+            var line = new ReceiptLine();
+            line.ItemId = item.Id;
+            line.Item = item;
+            line.Quantity = 1;
+            line.TotalPrice = item.Price;
+            ReceiptLines.Add(line);
+            await dbContext.ReceiptLines.AddAsync(line);
+        }
+        SumOfReceipt = ReceiptLines.Sum(l => l.TotalPrice);
+        
         await dbContext.SaveChangesAsync();
     }
 
     [RelayCommand]
-    private async Task GetFirstSampleRow()
-    {/*
-        var firstGreeting = await dbContext.Greetings.FirstOrDefaultAsync();
-        if (firstGreeting != null)
-        {
-            var box = MessageBoxManager.GetMessageBoxStandard("Information",
-                firstGreeting.GreetingText, ButtonEnum.Ok);
-            await box.ShowAsync();
-        }*/
+    public async Task CheckoutCommand()
+    {
+        
     }
 }

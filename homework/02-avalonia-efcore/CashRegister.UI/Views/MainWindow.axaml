@@ -17,15 +17,18 @@
     </Design.DataContext>
 
     <!-- Some code to demonstrate how to access the DB -->
-    <Grid ColumnDefinitions="Auto, Auto,*" RowDefinitions="Auto, *">
-        <ItemsControl Grid.Row="0" Grid.Column="0" ItemsSource="{Binding Items}">
+    <Grid ColumnDefinitions="*, *,*" RowDefinitions="*, *">
+        <ItemsControl Grid.ColumnSpan="3" Grid.Row="0" Grid.Column="0" ItemsSource="{Binding Items}">
             <ItemsControl.DataTemplates>
                 <DataTemplate x:DataType="data:Item">
-                    <StackPanel Orientation="Horizontal" Margin="10">
-                        <TextBlock Text="{Binding Name}" Margin="0,0,5,0"></TextBlock>
-                        <TextBlock Text="{Binding Amount}"></TextBlock>
-                        <TextBlock Text="{Binding AmountName}"></TextBlock>
-                    </StackPanel>
+                    <Button Command="{Binding $parent[ItemsControl].((vm:MainWindowViewModel)DataContext).AddItemToReceiptCommand}" 
+                            CommandParameter="{Binding }"> 
+                        <StackPanel Orientation="Horizontal" Margin="10" >
+                            <TextBlock Text="{Binding Name}" Margin="0,0,5,0"></TextBlock>
+                            <TextBlock Text="{Binding Amount}"></TextBlock>
+                            <TextBlock Text="{Binding AmountName}"></TextBlock>
+                        </StackPanel>
+                    </Button>
                 </DataTemplate>
             </ItemsControl.DataTemplates>
             <ItemsControl.ItemsPanel>
@@ -35,6 +38,31 @@
             </ItemsControl.ItemsPanel>
         </ItemsControl>
         <StackPanel Grid.Row="0" Grid.Column="1">
+            <DataGrid ItemsSource="{Binding ReceiptLines}"
+                      AutoGenerateColumns="False"
+                      IsReadOnly="True"
+                      Margin="0,10">
+                
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Produkt" 
+                                        Binding="{Binding Item.Name}"
+                                        Width="200"
+                                        CanUserSort="True" />
+                    
+                    <DataGridTextColumn Header="Menge" 
+                                        Binding="{Binding Quantity}" 
+                                        Width="120"
+                                        CanUserSort="True" />
+                    
+                    <DataGridTextColumn Header="Preis" 
+                                        Binding="{Binding TotalPrice}" 
+                                        Width="120"
+                                        CanUserSort="True" />
+                </DataGrid.Columns>
+            </DataGrid>
+            <TextBlock>Gesamtsumme:</TextBlock>
+            <TextBox Text="{Binding SumOfReceipt }"></TextBox>
+            <Button Command="{Binding CheckoutCommand}">Checkout</Button>
         </StackPanel>
     </Grid>
     

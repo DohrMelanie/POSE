@@ -38,7 +38,6 @@ public class ReceiptLine
 public class Receipt
 {
     public int Id { get; set; }
-    public DateTime Date { get; set; }
     public List<ReceiptLine> ReceiptLines { get; set; } = [];
     public decimal Total { get; set; }
 }
