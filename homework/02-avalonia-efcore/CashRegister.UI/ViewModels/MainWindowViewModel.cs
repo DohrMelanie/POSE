@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using CashRegister.Data;
@@ -11,9 +12,12 @@ namespace CashRegister.UI.ViewModels;
 public partial class MainWindowViewModel: ViewModelBase
 {
     private readonly ApplicationDataContext dbContext;
-    [ObservableProperty] private ObservableCollection<Item> items = [];
-    [ObservableProperty] private ObservableCollection<ReceiptLine> receiptLines = [];
-    [ObservableProperty] private decimal sumOfReceipt = 0;
+    [ObservableProperty] 
+    private ObservableCollection<Item> items = [];
+    public ObservableCollection<ReceiptLineViewModel> ReceiptLines { get; } = [];
+    
+    [ObservableProperty] 
+    private decimal sumOfReceipt;
 
     public MainWindowViewModel(IDbContextFactory<ApplicationDataContext> contextFactory) {
         dbContext = contextFactory.CreateDbContext();
@@ -44,32 +48,59 @@ public partial class MainWindowViewModel: ViewModelBase
     }
     
     [RelayCommand]
-    public async Task AddItemToReceiptCommand(Item item)
+    public void AddItemToReceiptCommand(Item item)
     {
-        if (ReceiptLines.Any(l => l.ItemId == item.Id))
+        var existingLine = ReceiptLines.FirstOrDefault(l => l.ItemId == item.Id);
+        if (existingLine == null)
         {
-            var line = ReceiptLines.First(l => l.ItemId == item.Id);
-            line.Quantity++;
-            line.TotalPrice = line.Quantity * item.Price;
+            var line = new ReceiptLineViewModel
+            {
+                ItemId = item.Id,
+                Item = item,
+                Quantity = 1,
+                TotalPrice = item.Price
+            };
+            ReceiptLines.Add(line);
         }
         else
         {
-            var line = new ReceiptLine();
-            line.ItemId = item.Id;
-            line.Item = item;
-            line.Quantity = 1;
-            line.TotalPrice = item.Price;
-            ReceiptLines.Add(line);
-            await dbContext.ReceiptLines.AddAsync(line);
+            existingLine.Quantity++;
+            existingLine.TotalPrice = existingLine.Quantity * item.Price;
         }
         SumOfReceipt = ReceiptLines.Sum(l => l.TotalPrice);
-        
-        await dbContext.SaveChangesAsync();
     }
 
     [RelayCommand]
     public async Task CheckoutCommand()
     {
-        
+        var receipt = new Receipt
+        {
+            Total = SumOfReceipt,
+            ReceiptLines = ReceiptLines.Select(l => new ReceiptLine
+            {
+                ItemId = l.ItemId,
+                Quantity = l.Quantity,
+                TotalPrice = l.TotalPrice
+            }).ToList()
+        };
+        dbContext.Receipts.Add(receipt);
+        await dbContext.SaveChangesAsync();
+        ReceiptLines.Clear();
+        SumOfReceipt = 0;
     }
+}
+
+public partial class ReceiptLineViewModel : ObservableObject
+{
+    [ObservableProperty]
+    private int itemId;
+    
+    [ObservableProperty]
+    private Item? item;
+    
+    [ObservableProperty]
+    private int quantity;
+    
+    [ObservableProperty]
+    private decimal totalPrice;
 }

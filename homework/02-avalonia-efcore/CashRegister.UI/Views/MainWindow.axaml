@@ -17,8 +17,8 @@
     </Design.DataContext>
 
     <!-- Some code to demonstrate how to access the DB -->
-    <Grid ColumnDefinitions="*, *,*" RowDefinitions="*, *">
-        <ItemsControl Grid.ColumnSpan="3" Grid.Row="0" Grid.Column="0" ItemsSource="{Binding Items}">
+    <Grid ColumnDefinitions="*, *" RowDefinitions="*">
+        <ItemsControl Grid.Row="0" Grid.Column="0" ItemsSource="{Binding Items}">
             <ItemsControl.DataTemplates>
                 <DataTemplate x:DataType="data:Item">
                     <Button Command="{Binding $parent[ItemsControl].((vm:MainWindowViewModel)DataContext).AddItemToReceiptCommand}" 
@@ -40,28 +40,29 @@
         <StackPanel Grid.Row="0" Grid.Column="1">
             <DataGrid ItemsSource="{Binding ReceiptLines}"
                       AutoGenerateColumns="False"
+                      CanUserReorderColumns="False"
+                      CanUserResizeColumns="False"
                       IsReadOnly="True"
+                      GridLinesVisibility="Horizontal"
+                      HeadersVisibility="Column"
                       Margin="0,10">
                 
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Produkt" 
                                         Binding="{Binding Item.Name}"
-                                        Width="200"
-                                        CanUserSort="True" />
+                                        Width="200" />
                     
                     <DataGridTextColumn Header="Menge" 
                                         Binding="{Binding Quantity}" 
-                                        Width="120"
-                                        CanUserSort="True" />
+                                        Width="120"/>
                     
                     <DataGridTextColumn Header="Preis" 
                                         Binding="{Binding TotalPrice}" 
-                                        Width="120"
-                                        CanUserSort="True" />
+                                        Width="120" />
                 </DataGrid.Columns>
             </DataGrid>
             <TextBlock>Gesamtsumme:</TextBlock>
-            <TextBox Text="{Binding SumOfReceipt }"></TextBox>
+            <TextBlock Text="{Binding SumOfReceipt }"></TextBlock>
             <Button Command="{Binding CheckoutCommand}">Checkout</Button>
         </StackPanel>
     </Grid>
