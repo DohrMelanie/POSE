@@ -61,6 +61,7 @@
                                         Width="120" />
                 </DataGrid.Columns>
             </DataGrid>
+            
             <TextBlock>Gesamtsumme:</TextBlock>
             <TextBlock Text="{Binding SumOfReceipt }"></TextBlock>
             <Button Command="{Binding CheckoutCommand}">Checkout</Button>

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using CashRegister.Data;
@@ -48,7 +47,7 @@ public partial class MainWindowViewModel: ViewModelBase
     }
     
     [RelayCommand]
-    public void AddItemToReceiptCommand(Item item)
+    private void AddItemToReceipt(Item item)
     {
         var existingLine = ReceiptLines.FirstOrDefault(l => l.ItemId == item.Id);
         if (existingLine == null)
@@ -71,7 +70,7 @@ public partial class MainWindowViewModel: ViewModelBase
     }
 
     [RelayCommand]
-    public async Task CheckoutCommand()
+    private async Task Checkout()
     {
         var receipt = new Receipt
         {
