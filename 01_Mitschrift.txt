@@ -14,7 +14,7 @@ InitializeComponent nicht findbar -> kann an Rider liegen
 
 Avalonia: Für Zeug anzeigen - Control
 
-bei LF: so simpel wie in Übung inkl. ItemsPanel, WrapPanelx, ItemsControl,
+bei LF: so simpel wie in Übung inkl. ItemsPanel, WrapPanel, ItemsControl,
 
 Bei HÜ:
 Genereller Aufbau: Stackpanel?
