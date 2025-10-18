@@ -10,9 +10,11 @@
     <UserSecretsId>f099c3bc-6c44-4b6a-b90e-8a203ff4f38e</UserSecretsId>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Aspire.Hosting.AppHost" Version="9.5.1" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Aspire.Hosting.AppHost" Version="9.5.1" />
+        <PackageReference Include="Aspire.Hosting.NodeJs" Version="9.5.1" />
+        <PackageReference Include="CommunityToolkit.Aspire.Hosting.SQLite" Version="9.8.0" />
+    </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\CashRegister.API\CashRegister.API.csproj" />

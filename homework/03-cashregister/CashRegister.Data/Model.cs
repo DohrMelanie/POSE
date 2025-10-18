@@ -1,21 +1,14 @@
-﻿namespace CashRegister.Data;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace CashRegister.Data;
 
 public class Item
 {
     public int Id { get; set; }
-    public string Name { get; set; } = string.Empty;
+    [MaxLength(100)] public string Name { get; set; } = string.Empty;
     public decimal Price { get; set; }
     public int? Amount { get; set; }
-    public string? AmountName { get; set; } = string.Empty;
-      
-    public override string ToString()
-    {
-        if (Amount != null && !string.IsNullOrWhiteSpace(AmountName))
-        {
-          return $"{Name} ({Amount}{AmountName}) - {Price:C}";
-        }
-        return $"{Name} - {Price:C}";
-    }                                            
+    [MaxLength(20)] public string? AmountName { get; set; } = string.Empty;
 }
 
 public class ReceiptLine
