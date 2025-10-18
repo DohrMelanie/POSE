@@ -2,7 +2,11 @@ using CashRegister.API;
 using CashRegister.Data;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddScoped<ApplicationDataContext>();
+
+builder.AddServiceDefaults(); // auto logging, etc.
+
+builder.AddSqliteDbContext<ApplicationDataContext>("sqlite-db");
+
 builder.Services.AddOpenApi();
 
 builder.Services.AddCors(options =>

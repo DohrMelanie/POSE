@@ -8,10 +8,12 @@
     
     <ItemGroup>
         <ProjectReference Include="..\CashRegister.Data\CashRegister.Data.csproj" />
+        <ProjectReference Include="..\CashRegister.ServiceDefaults\CashRegister.ServiceDefaults.csproj" />
     </ItemGroup>
 
 
     <ItemGroup>
+        <PackageReference Include="CommunityToolkit.Aspire.Microsoft.EntityFrameworkCore.Sqlite" Version="9.7.2" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.9" />
     </ItemGroup>
     
