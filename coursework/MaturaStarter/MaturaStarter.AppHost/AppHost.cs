@@ -8,8 +8,13 @@ var sqlite = builder.AddSqlite(
     builder.Configuration["Database:fileName"])
     .WithSqliteWeb(); // works just with docker
 
-builder.AddProject<Webapi>("webapi")
+var webapi = builder.AddProject<Webapi>("webapi")
     .WithReference(sqlite);
+
+builder.AddNpmApp("frontend", "../Frontend")
+    .WithReference(webapi)
+    .WithHttpEndpoint(env: "PORT")
+    .WithExternalHttpEndpoints();
 
 builder.Build().Run();
 
