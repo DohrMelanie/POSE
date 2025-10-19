@@ -29,6 +29,7 @@ public static class CashRegisterEndpoints
 
     public static async Task<IResult> Checkout(ApplicationDataContext context, List<ReceiptLineDto> receiptLines)
     {
+        Console.WriteLine(receiptLines);
         var receipt = new Receipt();
         var total = 0m;
 
@@ -56,11 +57,24 @@ public static class CashRegisterEndpoints
         receipt.Total = total;
         context.Receipts.Add(receipt);
         await context.SaveChangesAsync();
+        
+        var result = new
+        {
+            receipt.Id,
+            receipt.Total,
+            Lines = receipt.ReceiptLines.Select(l => new
+            {
+                l.ItemId,
+                l.Quantity,
+                l.TotalPrice
+            })
+        };
 
-        return Results.Ok(receipt);
+        return Results.Ok(result);
     }
-    public record ReceiptLineDto(int ItemId, int Quantity); // calculate rest
 
+    public record ReceiptLineDto(int ItemId, int Quantity);
+    
     public static async Task<IResult> GetItems(ApplicationDataContext context)
     {
         await AddInitialData(context);

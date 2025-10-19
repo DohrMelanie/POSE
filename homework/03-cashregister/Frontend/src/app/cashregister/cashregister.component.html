@@ -1,0 +1,63 @@
+<div class="cashroot">
+	<!-- Items panel -->
+	<section>
+		<h2 class="text-lg font-semibold mb-2">Produkte</h2>
+
+		<div class="items-wrap">
+			@if (loading()) {
+				<div class="small-muted">Lade Artikel...</div>
+			} @else {
+				@if (error()) {
+					<div class="text-red-600">{{ error() }}</div>
+				} @else {
+                    <ng-container *ngFor="let item of items(); trackBy: trackItem">
+                        <button class="item-btn" type="button" (click)="addItem(item)">
+                            <div class="flex flex-col">
+                                <span class="font-medium">{{ item.name }}</span>
+                                <span class="small-muted">{{ item.amount ?? '' }} {{ item.amountName ?? '' }}</span>
+                            </div>
+                            <div class="ml-4 font-semibold">{{ item.price | number:'1.2-2' }}€</div>
+                        </button>
+                    </ng-container>
+				}
+			}
+		</div>
+	</section>
+
+	<div class="receipt">
+		<h2 class="text-lg font-semibold mb-2">Warenkorb</h2>
+
+		@if (receiptLines().length === 0) {
+			<div class="small-muted mb-2">Keine Artikel</div>
+		} @else {
+			<div class="overflow-auto max-h-64 mb-2">
+				<table class="w-full text-sm">
+					<thead>
+						<tr class="text-left text-xs text-gray-500">
+							<th>Produkt</th>
+							<th class="w-20">Menge</th>
+							<th class="w-24">Preis</th>
+						</tr>
+					</thead>
+					<tbody>
+                        <tr *ngFor="let line of receiptLines(); trackBy: trackLine">
+                            <td>{{ line.item?.name }}</td>
+                            <td>{{ line.quantity }}</td>
+                            <td>{{ line.totalPrice | number:'1.2-2' }}€</td>
+                        </tr>
+					</tbody>
+				</table>
+			</div>
+
+			<div class="flex justify-between items-center mb-2">
+				<div class="font-medium">Gesamtsumme:</div>
+				<div class="font-semibold">{{ total() | number:'1.2-2' }}€</div>
+			</div>
+
+			<div class="flex gap-2">
+				<button class="px-3 py-1 bg-blue-600 text-white rounded" type="button" (click)="checkout()" [disabled]="loading()">Checkout</button>
+				<button class="px-3 py-1 border rounded" type="button" (click)="receiptLines.set([])" [disabled]="loading()">Clear</button>
+			</div>
+		}
+	</div>
+</div>

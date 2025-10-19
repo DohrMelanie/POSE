@@ -1,5 +1,6 @@
 using CashRegister.API;
 using CashRegister.Data;
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,24 +10,22 @@ builder.AddSqliteDbContext<ApplicationDataContext>("sqlite-db");
 
 builder.Services.AddOpenApi();
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("CashRegisterCorsPolicy",
-        policyBuilder =>
-        {
-            policyBuilder.WithOrigins("http://localhost:4200");
-            policyBuilder.AllowAnyHeader();
-            policyBuilder.AllowAnyMethod();
-            policyBuilder.AllowCredentials();
-        });
-});
+builder.Services.AddCors();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+app.UseCors(options =>
+{
+    options.AllowAnyOrigin()
+        .AllowAnyMethod()
+        .AllowAnyHeader();
+});
+
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.MapScalarApiReference();
+
 }
 
 app.MapCashRegisterEndpoints();
