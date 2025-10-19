@@ -12,11 +12,11 @@ var sqlite = builder
 var webapi = builder
     .AddProject<CashRegister_API>("api")
     .WithReference(sqlite);
-/*
+
 builder
-    .AddNpmApp("frontend", "../CashRegister.Frontend")
+    .AddNpmApp("frontend", "../Frontend")
     .WithReference(webapi)
     .WithHttpEndpoint(env: "PORT")
     .WithExternalHttpEndpoints();
-*/
+
 builder.Build().Run();

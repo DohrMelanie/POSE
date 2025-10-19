@@ -4,3 +4,5 @@ obj
 homework/02-avalonia-efcore/cashregister.db-shm
 homework/02-avalonia-efcore/cashregister.db-wal
 homework/03-cashregister/CashRegister.Data/database.db
+homework/03-cashregister/CashRegister.Data/database.db-shm
+homework/03-cashregister/CashRegister.Data/database.db-wal

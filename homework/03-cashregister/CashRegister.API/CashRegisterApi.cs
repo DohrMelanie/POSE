@@ -14,9 +14,5 @@ public static class CashRegisterApi
             .WithName("Checkout")
             .WithDescription("Checkout items")
             .Produces<Data.Receipt>(201);
-        
-        group.MapPost("/initialize", CashRegisterEndpoints.AddInitialData)
-            .WithName("Initialize")
-            .WithDescription("Initialize database with initial data");
     }
 }

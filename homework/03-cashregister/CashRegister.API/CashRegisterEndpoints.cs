@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CashRegister.API;
 
-public class CashRegisterEndpoints
+public static class CashRegisterEndpoints
 {
-    public static async Task<IResult> AddInitialData(ApplicationDataContext context)
+    private static async Task AddInitialData(ApplicationDataContext context)
     {
         if (!context.Items.Any())
         {
@@ -22,11 +22,9 @@ public class CashRegisterEndpoints
                 new() { Name = "Joghurt", Price = 0.49m, Amount = 200, AmountName = "g" },
                 new() { Name = "Butter", Price = 1.49m }
             };
-
             context.Items.AddRange(items);
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync();    
         }
-        return Results.Ok();
     }
 
     public static async Task<IResult> Checkout(ApplicationDataContext context, List<ReceiptLineDto> receiptLines)
@@ -65,6 +63,7 @@ public class CashRegisterEndpoints
 
     public static async Task<IResult> GetItems(ApplicationDataContext context)
     {
+        await AddInitialData(context);
         var items = await context.Items.ToListAsync();
         return Results.Ok(items);
     }
