@@ -6,18 +6,18 @@ namespace AppServices.Importer;
 /// <summary>
 /// Interface for writing objects to the database
 /// </summary>
-public interface IDummyImportDatabaseWriter
+public interface ITodoItemsImportDatabaseWriter
 {
     /// <summary>
-    /// Clears all existing Dummy records from the database
+    /// Clears all existing TodoItem records from the database
     /// </summary>
     Task ClearAllAsync();
 
     /// <summary>
-    /// Writes a collection of Dummy objects to the database
+    /// Writes a collection of TodoItem objects to the database
     /// </summary>
-    /// <param name="dummies">Dummies to write</param>
-    Task WriteDummiesAsync(IEnumerable<Dummy> dummies);
+    /// <param name="items">TodoItems to write</param>
+    Task WriteTodoItemsAsync(IEnumerable<TodoItem> items);
 
     /// <summary>
     /// Begins a database transaction
@@ -38,18 +38,18 @@ public interface IDummyImportDatabaseWriter
 /// <summary>
 /// Implementation for writing objects to the database
 /// </summary>
-public class DummyImportDatabaseWriter(ApplicationDataContext context) : IDummyImportDatabaseWriter
+public class TodoItemsImportDatabaseWriter(ApplicationDataContext context) : ITodoItemsImportDatabaseWriter
 {
     private IDbContextTransaction? transaction;
 
     public async Task ClearAllAsync()
     {
-        await context.Dummies.ExecuteDeleteAsync();
+        await context.TodoItems.ExecuteDeleteAsync();
     }
 
-    public async Task WriteDummiesAsync(IEnumerable<Dummy> dummies)
+    public async Task WriteTodoItemsAsync(IEnumerable<TodoItem> items)
     {
-        await context.Dummies.AddRangeAsync(dummies);
+        await context.TodoItems.AddRangeAsync(items);
         await context.SaveChangesAsync();
     }
 

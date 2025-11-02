@@ -7,15 +7,15 @@ public class DataImporterTests
 {
     private readonly IFileReader fileReader;
     private readonly IDummyCsvParser csvParser;
-    private readonly IDummyImportDatabaseWriter databaseWriter;
-    private readonly DummyImporter importer;
+    private readonly ITodoItemsImportDatabaseWriter databaseWriter;
+    private readonly TodoItemsImporter importer;
 
     public DataImporterTests()
     {
         fileReader = Substitute.For<IFileReader>();
         csvParser = Substitute.For<IDummyCsvParser>();
-        databaseWriter = Substitute.For<IDummyImportDatabaseWriter>();
-        importer = new DummyImporter(fileReader, csvParser, databaseWriter);
+        databaseWriter = Substitute.For<ITodoItemsImportDatabaseWriter>();
+        importer = new TodoItemsImporter(fileReader, csvParser, databaseWriter);
     }
 
     [Fact]
@@ -23,10 +23,10 @@ public class DataImporterTests
     {
         // Arrange
         var csvFilePath = "test.csv";
-        var csvContent = "Name;DecimalProperty\nTest1;10.5";
-        var dummies = new List<Dummy>
+        var csvContent = "Assignee: Rainer\nTodos:\n* Shopping";
+        var dummies = new List<TodoItem>
         {
-            new() { Name = "Test1", DecimalProperty = 10.5m }
+            new() { Assignee = "Rainer", Title = "Shopping" }
         };
 
         fileReader.ReadAllTextAsync(csvFilePath).Returns(Task.FromResult(csvContent));
@@ -39,7 +39,7 @@ public class DataImporterTests
         Assert.Equal(1, result);
         await databaseWriter.Received(1).BeginTransactionAsync();
         await databaseWriter.Received(1).ClearAllAsync();
-        await databaseWriter.Received(1).WriteDummiesAsync(Arg.Is<IEnumerable<Dummy>>(d => d.Count() == 1));
+        await databaseWriter.Received(1).WriteTodoItemsAsync(Arg.Is<IEnumerable<TodoItem>>(d => d.Count() == 1));
         await databaseWriter.Received(1).CommitTransactionAsync();
         await databaseWriter.DidNotReceive().RollbackTransactionAsync();
     }
@@ -49,11 +49,12 @@ public class DataImporterTests
     {
         // Arrange
         var csvFilePath = "test.csv";
-        var csvContent = "Name;DecimalProperty\nTest1;10.5\nTest2;20.75";
-        var dummies = new List<Dummy>
+        var csvContent = "Assignee: Rainer\nTodos:\n* Shopping\n* Prepare lecture\n---\nAssignee: Karin\n Todos:\n* Practice the Piano";
+        var dummies = new List<TodoItem>
         {
-            new() { Name = "Test1", DecimalProperty = 10.5m },
-            new() { Name = "Test2", DecimalProperty = 20.75m }
+            new() { Assignee = "Rainer", Title = "Shopping" },
+            new() { Assignee = "Rainer", Title = "Prepare lecture" },
+            new() { Assignee = "Karin", Title = "Practice the Piano" }
         };
 
         fileReader.ReadAllTextAsync(csvFilePath).Returns(Task.FromResult(csvContent));
@@ -105,39 +106,15 @@ public class DataImporterTests
         await databaseWriter.Received(1).RollbackTransactionAsync();
         await databaseWriter.DidNotReceive().CommitTransactionAsync();
     }
-
-    [Fact]
-    public async Task ImportFromCsvAsync_DatabaseWriterThrows_RollsBackAndRethrows()
-    {
-        // Arrange
-        var csvFilePath = "test.csv";
-        var csvContent = "Name;DecimalProperty\nTest1;10.5";
-        var dummies = new List<Dummy>
-        {
-            new() { Name = "Test1", DecimalProperty = 10.5m }
-        };
-        var expectedException = new InvalidOperationException("Database error");
-
-        fileReader.ReadAllTextAsync(csvFilePath).Returns(Task.FromResult(csvContent));
-        csvParser.ParseCsv(csvContent).Returns(dummies);
-        databaseWriter.WriteDummiesAsync(Arg.Any<IEnumerable<Dummy>>()).Throws(expectedException);
-
-        // Act & Assert
-        await Assert.ThrowsAsync<InvalidOperationException>(
-            async () => await importer.ImportFromCsvAsync(csvFilePath));
-
-        await databaseWriter.Received(1).BeginTransactionAsync();
-        await databaseWriter.Received(1).RollbackTransactionAsync();
-        await databaseWriter.DidNotReceive().CommitTransactionAsync();
-    }
+    
 
     [Fact]
     public async Task ImportFromCsvAsync_EmptyFile_ReturnsZero()
     {
         // Arrange
         var csvFilePath = "test.csv";
-        var csvContent = "Name;DecimalProperty\n";
-        var dummies = new List<Dummy>();
+        var csvContent = "Assignee: Rainer\n";
+        var dummies = new List<TodoItem>();
 
         fileReader.ReadAllTextAsync(csvFilePath).Returns(Task.FromResult(csvContent));
         csvParser.ParseCsv(csvContent).Returns(dummies);
@@ -147,7 +124,7 @@ public class DataImporterTests
 
         // Assert
         Assert.Equal(0, result);
-        await databaseWriter.Received(1).WriteDummiesAsync(Arg.Is<IEnumerable<Dummy>>(d => d.Count() == 0));
+        await databaseWriter.Received(1).WriteTodoItemsAsync(Arg.Is<IEnumerable<TodoItem>>(d => d.Count() == 0));
         await databaseWriter.Received(1).CommitTransactionAsync();
     }
 
@@ -156,8 +133,8 @@ public class DataImporterTests
     {
         // Arrange
         var csvFilePath = "test.csv";
-        var csvContent = "Name;DecimalProperty\nTest1;10.5";
-        var dummies = new List<Dummy> { new() { Name = "Test1", DecimalProperty = 10.5m } };
+        var csvContent = "Assignee: Rainer\nTodos:\n* Shopping";
+        var dummies = new List<TodoItem> { new() { Assignee = "Test1", Title = "TestTitle" } };
 
         fileReader.ReadAllTextAsync(csvFilePath).Returns(Task.FromResult(csvContent));
         csvParser.ParseCsv(csvContent).Returns(dummies);
@@ -172,7 +149,7 @@ public class DataImporterTests
             await databaseWriter.ClearAllAsync();
             await fileReader.ReadAllTextAsync(csvFilePath);
             csvParser.ParseCsv(csvContent);
-            await databaseWriter.WriteDummiesAsync(Arg.Any<IEnumerable<Dummy>>());
+            await databaseWriter.WriteTodoItemsAsync(Arg.Any<IEnumerable<TodoItem>>());
             await databaseWriter.CommitTransactionAsync();
         });
     }

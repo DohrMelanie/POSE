@@ -3,7 +3,7 @@ namespace AppServices.Importer;
 /// <summary>
 /// Interface for importing data from CSV files
 /// </summary>
-public interface IDummyImporter
+public interface ITodoItemsImporter
 {
     /// <summary>
     /// Imports data from a CSV file
@@ -17,7 +17,7 @@ public interface IDummyImporter
 /// <summary>
 /// Implementation for importing data from CSV files
 /// </summary>
-public class DummyImporter(IFileReader fileReader, IDummyCsvParser csvParser, IDummyImportDatabaseWriter databaseWriter) : IDummyImporter
+public class TodoItemsImporter(IFileReader fileReader, IDummyCsvParser csvParser, ITodoItemsImportDatabaseWriter databaseWriter) : ITodoItemsImporter
 {
     public async Task<int> ImportFromCsvAsync(string csvFilePath, bool isDryRun = false)
     {
@@ -32,10 +32,10 @@ public class DummyImporter(IFileReader fileReader, IDummyCsvParser csvParser, ID
             var csvContent = await fileReader.ReadAllTextAsync(csvFilePath);
 
             // Parse CSV content
-            var dummies = csvParser.ParseCsv(csvContent).ToList();
+            var items = csvParser.ParseCsv(csvContent).ToList();
 
             // Write to database
-            await databaseWriter.WriteDummiesAsync(dummies);
+            await databaseWriter.WriteTodoItemsAsync(items);
 
             if (isDryRun)
             {
@@ -46,7 +46,7 @@ public class DummyImporter(IFileReader fileReader, IDummyCsvParser csvParser, ID
                 await databaseWriter.CommitTransactionAsync();
             }
 
-            return dummies.Count;
+            return items.Count;
         }
         catch
         {

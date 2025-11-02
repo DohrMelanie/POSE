@@ -32,7 +32,7 @@ try
     }
 
     // Get the importer service from DI container
-    var importer = host.Services.GetRequiredService<IDummyImporter>();
+    var importer = host.Services.GetRequiredService<ITodoItemsImporter>();
 
     // Perform the import
     var importedCount = await importer.ImportFromCsvAsync(parsedArgs.CsvFilePath, parsedArgs.IsDryRun);
@@ -79,7 +79,7 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
 
     // Register application services
     services.AddScoped<IFileReader, FileReader>();
-    services.AddScoped<IDummyCsvParser, DummyCsvParser>();
-    services.AddScoped<IDummyImportDatabaseWriter, DummyImportDatabaseWriter>();
-    services.AddScoped<IDummyImporter, DummyImporter>();
+    services.AddScoped<IDummyCsvParser, TodoItemsTxtParser>();
+    services.AddScoped<ITodoItemsImportDatabaseWriter, TodoItemsImportDatabaseWriter>();
+    services.AddScoped<ITodoItemsImporter, TodoItemsImporter>();
 }

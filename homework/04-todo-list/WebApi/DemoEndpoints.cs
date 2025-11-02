@@ -12,12 +12,13 @@ public static class DemoEndpoints
 
         // Demonstrates an endpoint interacting with the database
         // and returning a list of objects.
-        app.MapGet("/dummies", (ApplicationDataContext db) => db.Dummies)
+        app.MapGet("/items", (ApplicationDataContext db) => db.TodoItems)
             .WithDescription("Gets all dummy records from the database.");
 
         // Demonstrates an endpoint that uses a service to perform some logic.
         // Receives an object, modifies it using the service, and returns the 
         // modified object.
+        /*
         app.MapPost("/dummy-logic", async (ApplicationDataContext db, Dummy dummyToChange, IDummyLogic logic) =>
         {
             logic.IncrementDecimal(dummyToChange, 1.5m);
@@ -25,15 +26,14 @@ public static class DemoEndpoints
         })
         .Produces<Dummy>(StatusCodes.Status200OK)
         .WithDescription("Increments the DecimalProperty of the provided Dummy object by 1.5 using the DummyLogic service.");
-
         app.MapPost("/generate", GenerateRecords)
         .Produces<List<DemoOutputDto>>(StatusCodes.Status200OK)
         .Produces(StatusCodes.Status400BadRequest)
         .WithDescription("Generates a list of DemoOutputDto objects based on the specified number of records.");
-
+        */
         return app;
     }
-
+/*
     public static IResult GenerateRecords(DemoInputDto input)
     {
         if (input.NumberOfRecords < 1 || input.NumberOfRecords > 1000)
@@ -45,7 +45,7 @@ public static class DemoEndpoints
             .Select(i => new DemoOutputDto(i, $"Name {i}"))
             .ToList();
         return Results.Ok(output);
-    }
+    }*/
 }
 
 public record DemoInputDto(int NumberOfRecords);

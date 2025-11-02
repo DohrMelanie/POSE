@@ -14,12 +14,12 @@ public class DatabaseTestsWithClassFixture(DatabaseFixture fixture)
         int dummyId;
         await using (var context = new ApplicationDataContext(fixture.Options))
         {
-            var dummy = new Dummy 
+            var dummy = new TodoItem 
             { 
-                Name = "Test Dummy", 
-                DecimalProperty = 42.5m 
+                Assignee = "Test Dummy",
+                Title = "Test Name"
             };
-            context.Dummies.Add(dummy);
+            context.TodoItems.Add(dummy);
             await context.SaveChangesAsync();
             dummyId = dummy.Id;
         }
@@ -27,10 +27,9 @@ public class DatabaseTestsWithClassFixture(DatabaseFixture fixture)
         // Assert
         await using (var context = new ApplicationDataContext(fixture.Options))
         {
-            var dummy = await context.Dummies.FindAsync(dummyId);
+            var dummy = await context.TodoItems.FindAsync(dummyId);
             Assert.NotNull(dummy);
-            Assert.Equal("Test Dummy", dummy.Name);
-            Assert.Equal(42.5m, dummy.DecimalProperty);
+            Assert.Equal("Test Dummy", dummy.Assignee);
         }
     }
 
@@ -41,12 +40,12 @@ public class DatabaseTestsWithClassFixture(DatabaseFixture fixture)
         int dummyId;
         await using (var context = new ApplicationDataContext(fixture.Options))
         {
-            var dummy = new Dummy 
+            var dummy = new TodoItem 
             { 
-                Name = "Original Name", 
-                DecimalProperty = 10.0m 
+                Assignee = "Original Name", 
+                Title = "Original Title"
             };
-            context.Dummies.Add(dummy);
+            context.TodoItems.Add(dummy);
             await context.SaveChangesAsync();
             dummyId = dummy.Id;
         }
@@ -54,20 +53,19 @@ public class DatabaseTestsWithClassFixture(DatabaseFixture fixture)
         // Act
         await using (var context = new ApplicationDataContext(fixture.Options))
         {
-            var dummy = await context.Dummies.FindAsync(dummyId);
+            var dummy = await context.TodoItems.FindAsync(dummyId);
             Assert.NotNull(dummy);
-            dummy.Name = "Updated Name";
-            dummy.DecimalProperty = 20.5m;
+            dummy.Assignee = "Updated Name";
             await context.SaveChangesAsync();
         }
 
         // Assert
         await using (var context = new ApplicationDataContext(fixture.Options))
         {
-            var dummy = await context.Dummies.FindAsync(dummyId);
+            var dummy = await context.TodoItems.FindAsync(dummyId);
             Assert.NotNull(dummy);
-            Assert.Equal("Updated Name", dummy.Name);
-            Assert.Equal(20.5m, dummy.DecimalProperty);
+            Assert.Equal("Updated Name", dummy.Assignee);
+            Assert.Equal("Original Title", dummy.Title);
         }
     }
 
@@ -78,12 +76,12 @@ public class DatabaseTestsWithClassFixture(DatabaseFixture fixture)
         int dummyId;
         await using (var context = new ApplicationDataContext(fixture.Options))
         {
-            var dummy = new Dummy 
+            var dummy = new TodoItem 
             { 
-                Name = "To Delete", 
-                DecimalProperty = 5.0m 
+                Assignee = "To Delete", 
+                Title = "To Delete"
             };
-            context.Dummies.Add(dummy);
+            context.TodoItems.Add(dummy);
             await context.SaveChangesAsync();
             dummyId = dummy.Id;
         }
@@ -91,16 +89,16 @@ public class DatabaseTestsWithClassFixture(DatabaseFixture fixture)
         // Act
         await using (var context = new ApplicationDataContext(fixture.Options))
         {
-            var dummy = await context.Dummies.FindAsync(dummyId);
+            var dummy = await context.TodoItems.FindAsync(dummyId);
             Assert.NotNull(dummy);
-            context.Dummies.Remove(dummy);
+            context.TodoItems.Remove(dummy);
             await context.SaveChangesAsync();
         }
 
         // Assert
         await using (var context = new ApplicationDataContext(fixture.Options))
         {
-            var dummy = await context.Dummies.FindAsync(dummyId);
+            var dummy = await context.TodoItems.FindAsync(dummyId);
             Assert.Null(dummy);
         }
     }
@@ -111,10 +109,10 @@ public class DatabaseTestsWithClassFixture(DatabaseFixture fixture)
         // Arrange
         await using (var context = new ApplicationDataContext(fixture.Options))
         {
-            context.Dummies.AddRange(
-                new Dummy { Name = "Query Test 1", DecimalProperty = 10.0m },
-                new Dummy { Name = "Query Test 2", DecimalProperty = 20.0m },
-                new Dummy { Name = "Query Test 3", DecimalProperty = 30.0m }
+            context.TodoItems.AddRange(
+                new TodoItem { Assignee = "Query Test 1", Title = "Test" },
+                new TodoItem { Assignee = "Query Test 2", Title = "test" },
+                new TodoItem { Assignee = "Query Test 3", Title = "test" }
             );
             await context.SaveChangesAsync();
         }
@@ -122,41 +120,14 @@ public class DatabaseTestsWithClassFixture(DatabaseFixture fixture)
         // Act & Assert
         await using (var context = new ApplicationDataContext(fixture.Options))
         {
-            var dummies = await context.Dummies
-                .Where(d => d.Name.StartsWith("Query Test") && d.DecimalProperty >= 15.0m)
-                .OrderBy(d => d.Name)
+            var dummies = await context.TodoItems
+                .Where(d => d.Assignee.StartsWith("Query Test") && d.Title.StartsWith('t'))
+                .OrderBy(d => d.Assignee)
                 .ToListAsync();
 
             Assert.Equal(2, dummies.Count);
-            Assert.Equal("Query Test 2", dummies[0].Name);
-            Assert.Equal("Query Test 3", dummies[1].Name);
-        }
-    }
-
-    [Fact]
-    public async Task DecimalPropertyStoresCorrectly()
-    {
-        // Arrange & Act
-        int dummyId;
-        await using (var context = new ApplicationDataContext(fixture.Options))
-        {
-            var dummy = new Dummy 
-            { 
-                Name = "Decimal Test", 
-                DecimalProperty = 123.456m 
-            };
-            context.Dummies.Add(dummy);
-            await context.SaveChangesAsync();
-            dummyId = dummy.Id;
-        }
-
-        // Assert
-        await using (var context = new ApplicationDataContext(fixture.Options))
-        {
-            var dummy = await context.Dummies.FindAsync(dummyId);
-            Assert.NotNull(dummy);
-            // Note: Due to the REAL conversion in your model, precision might be limited
-            Assert.Equal(123.456m, dummy.DecimalProperty, 3);
+            Assert.Equal("Query Test 2", dummies[0].Assignee);
+            Assert.Equal("Query Test 3", dummies[1].Assignee);
         }
     }
 }

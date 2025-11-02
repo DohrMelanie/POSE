@@ -6,14 +6,10 @@ namespace AppServices;
 
 public partial class ApplicationDataContext(DbContextOptions<ApplicationDataContext> options) : DbContext(options)
 {
-    public DbSet<Dummy> Dummies => Set<Dummy>();
+    public DbSet<TodoItem> TodoItems => Set<TodoItem>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Dummy>()
-            .Property(e => e.DecimalProperty)
-            .HasConversion<double>() // or use string for exact precision
-            .HasColumnType("REAL");
     }
 }
 

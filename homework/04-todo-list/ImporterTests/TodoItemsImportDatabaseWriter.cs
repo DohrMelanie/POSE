@@ -9,14 +9,14 @@ public class DatabaseWriterTests(DatabaseFixture fixture)
     : IClassFixture<DatabaseFixture>
 {
     [Fact]
-    public async Task ClearAllAsync_RemovesAllDummies()
+    public async Task ClearAllAsync_RemovesAllTodoItems()
     {
         // Arrange
         await using (var context = new ApplicationDataContext(fixture.Options))
         {
-            context.Dummies.AddRange(
-                new Dummy { Name = "Test1", DecimalProperty = 10.5m },
-                new Dummy { Name = "Test2", DecimalProperty = 20.75m }
+            context.TodoItems.AddRange(
+                new TodoItem { Assignee = "Test1", Title = "Test1" },
+                new TodoItem { Assignee = "Test2", Title = "Test2" }
             );
             await context.SaveChangesAsync();
         }
@@ -24,7 +24,7 @@ public class DatabaseWriterTests(DatabaseFixture fixture)
         // Act
         await using (var context = new ApplicationDataContext(fixture.Options))
         {
-            var writer = new DummyImportDatabaseWriter(context);
+            var writer = new TodoItemsImportDatabaseWriter(context);
             await writer.ClearAllAsync();
         }
 
@@ -32,7 +32,7 @@ public class DatabaseWriterTests(DatabaseFixture fixture)
         await using (var context = new ApplicationDataContext(fixture.Options))
         {
             // Assert
-            var count = await context.Dummies.CountAsync();
+            var count = await context.TodoItems.CountAsync();
             Assert.Equal(0, count);
         }
     }
@@ -41,24 +41,24 @@ public class DatabaseWriterTests(DatabaseFixture fixture)
     public async Task WriteDummiesAsync_AddsDummiesToDatabase()
     {
         // Arrange
-        var dummies = new List<Dummy>
+        var dummies = new List<TodoItem>
         {
-            new() { Name = "Test1", DecimalProperty = 10.5m },
-            new() { Name = "Test2", DecimalProperty = 20.75m }
+            new() { Assignee = "Test1", Title = "Test1" },
+            new() { Assignee = "Test2", Title = "Test2" }
         };
 
         // Act
         await using (var context = new ApplicationDataContext(fixture.Options))
         {
-            var writer = new DummyImportDatabaseWriter(context);
+            var writer = new TodoItemsImportDatabaseWriter(context);
             await writer.ClearAllAsync();
-            await writer.WriteDummiesAsync(dummies);
+            await writer.WriteTodoItemsAsync(dummies);
         }
 
         // Assert
         await using (var context = new ApplicationDataContext(fixture.Options))
         {
-            var count = await context.Dummies.CountAsync();
+            var count = await context.TodoItems.CountAsync();
             Assert.Equal(2, count);
         }
     }
@@ -69,23 +69,23 @@ public class DatabaseWriterTests(DatabaseFixture fixture)
         // Arrange
         var dummies = new[]
         { 
-            new Dummy { Name = "Test", DecimalProperty = 10.5m }
+            new TodoItem { Assignee = "Test", Title = "Test" }
         };
 
         // Act
         await using (var context = new ApplicationDataContext(fixture.Options))
         {
-            var writer = new DummyImportDatabaseWriter(context);
+            var writer = new TodoItemsImportDatabaseWriter(context);
             await writer.ClearAllAsync();
             await writer.BeginTransactionAsync();
-            await writer.WriteDummiesAsync(dummies);
+            await writer.WriteTodoItemsAsync(dummies);
             await writer.CommitTransactionAsync();
         }
 
         // Assert
         await using (var context = new ApplicationDataContext(fixture.Options))
         {
-            var count = await context.Dummies.CountAsync();
+            var count = await context.TodoItems.CountAsync();
             Assert.Equal(1, count);
         }
     }
@@ -94,25 +94,25 @@ public class DatabaseWriterTests(DatabaseFixture fixture)
     public async Task TransactionMethods_RollbackSucceeds()
     {
         // Arrange
-        var dummies = new Dummy[]
+        var dummies = new TodoItem[]
         {
-            new() { Name = "Test", DecimalProperty = 10.5m }
+            new() { Assignee = "Test", Title = "Test" }
         };
 
         // Act
         await using (var context = new ApplicationDataContext(fixture.Options))
         {
-            var writer = new DummyImportDatabaseWriter(context);
+            var writer = new TodoItemsImportDatabaseWriter(context);
             await writer.ClearAllAsync();
             await writer.BeginTransactionAsync();
-            await writer.WriteDummiesAsync(dummies);
+            await writer.WriteTodoItemsAsync(dummies);
             await writer.RollbackTransactionAsync();
         }
 
         // Assert
         await using (var context = new ApplicationDataContext(fixture.Options))
         {
-            var count = await context.Dummies.CountAsync();
+            var count = await context.TodoItems.CountAsync();
             Assert.Equal(0, count);
         }
     }

@@ -1,8 +1,9 @@
 ﻿namespace AppServices;
 
-public class Dummy
+public class TodoItem
 {
     public int Id { get; set; }
-    public string Name { get; set; } = string.Empty;
-    public decimal DecimalProperty { get; set; }
+    public required string Title { get; set; } = string.Empty;
+    public required string Assignee { get; set; } = string.Empty;
+    public bool IsCompleted { get; set; } = false;
 }
