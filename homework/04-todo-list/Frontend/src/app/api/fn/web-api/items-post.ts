@@ -7,26 +7,26 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
-import { Dummy } from '../../models/dummy';
+import { TodoItem } from '../../models/todo-item';
 
-export interface DummyLogicPost$Params {
-      body: Dummy
+export interface ItemsPost$Params {
+      body: TodoItem
 }
 
-export function dummyLogicPost(http: HttpClient, rootUrl: string, params: DummyLogicPost$Params, context?: HttpContext): Observable<StrictHttpResponse<Dummy>> {
-  const rb = new RequestBuilder(rootUrl, dummyLogicPost.PATH, 'post');
+export function itemsPost(http: HttpClient, rootUrl: string, params: ItemsPost$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
+  const rb = new RequestBuilder(rootUrl, itemsPost.PATH, 'post');
   if (params) {
     rb.body(params.body, 'application/json');
   }
 
   return http.request(
-    rb.build({ responseType: 'json', accept: 'application/json', context })
+    rb.build({ responseType: 'text', accept: '*/*', context })
   ).pipe(
     filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
     map((r: HttpResponse<any>) => {
-      return r as StrictHttpResponse<Dummy>;
+      return (r as HttpResponse<any>).clone({ body: undefined }) as StrictHttpResponse<void>;
     })
   );
 }
 
-dummyLogicPost.PATH = '/dummy-logic';
+itemsPost.PATH = '/items';

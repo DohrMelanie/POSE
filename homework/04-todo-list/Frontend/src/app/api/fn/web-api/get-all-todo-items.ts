@@ -7,23 +7,24 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
+import { TodoItem } from '../../models/todo-item';
 
-export interface PingGet$Params {
+export interface GetAllTodoItems$Params {
 }
 
-export function pingGet(http: HttpClient, rootUrl: string, params?: PingGet$Params, context?: HttpContext): Observable<StrictHttpResponse<string>> {
-  const rb = new RequestBuilder(rootUrl, pingGet.PATH, 'get');
+export function getAllTodoItems(http: HttpClient, rootUrl: string, params?: GetAllTodoItems$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<TodoItem>>> {
+  const rb = new RequestBuilder(rootUrl, getAllTodoItems.PATH, 'get');
   if (params) {
   }
 
   return http.request(
-    rb.build({ responseType: 'text', accept: 'text/plain', context })
+    rb.build({ responseType: 'json', accept: 'application/json', context })
   ).pipe(
     filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
     map((r: HttpResponse<any>) => {
-      return r as StrictHttpResponse<string>;
+      return r as StrictHttpResponse<Array<TodoItem>>;
     })
   );
 }
 
-pingGet.PATH = '/ping';
+getAllTodoItems.PATH = '/items';

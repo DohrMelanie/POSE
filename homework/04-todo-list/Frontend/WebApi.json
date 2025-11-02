@@ -5,32 +5,13 @@
     "version": "1.0.0"
   },
   "paths": {
-    "/ping": {
+    "/items": {
       "get": {
         "tags": [
           "WebApi"
         ],
-        "description": "A simple ping endpoint to check if the service is running.",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/dummies": {
-      "get": {
-        "tags": [
-          "WebApi"
-        ],
-        "description": "Gets all dummy records from the database.",
+        "description": "Gets all todo items the database.",
+        "operationId": "GetAllTodoItems",
         "responses": {
           "200": {
             "description": "OK",
@@ -39,26 +20,23 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Dummy"
+                    "$ref": "#/components/schemas/TodoItem"
                   }
                 }
               }
             }
           }
         }
-      }
-    },
-    "/dummy-logic": {
+      },
       "post": {
         "tags": [
           "WebApi"
         ],
-        "description": "Increments the DecimalProperty of the provided Dummy object by 1.5 using the DummyLogic service.",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Dummy"
+                "$ref": "#/components/schemas/TodoItem"
               }
             }
           },
@@ -66,29 +44,32 @@
         },
         "responses": {
           "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Dummy"
-                }
-              }
-            }
+            "description": "OK"
           }
         }
       }
     },
-    "/generate": {
-      "post": {
+    "/items/{id}": {
+      "put": {
         "tags": [
-          "DemoEndpoints"
+          "WebApi"
         ],
-        "description": "Generates a list of DemoOutputDto objects based on the specified number of records.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/DemoInputDto"
+                "$ref": "#/components/schemas/TodoItem"
               }
             }
           },
@@ -96,20 +77,28 @@
         },
         "responses": {
           "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/DemoOutputDto"
-                  }
-                }
-              }
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "WebApi"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
             }
-          },
-          "400": {
-            "description": "Bad Request"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
           }
         }
       }
@@ -117,22 +106,10 @@
   },
   "components": {
     "schemas": {
-      "DemoInputDto": {
+      "TodoItem": {
         "required": [
-          "numberOfRecords"
-        ],
-        "type": "object",
-        "properties": {
-          "numberOfRecords": {
-            "type": "integer",
-            "format": "int32"
-          }
-        }
-      },
-      "DemoOutputDto": {
-        "required": [
-          "id",
-          "name"
+          "title",
+          "assignee"
         ],
         "type": "object",
         "properties": {
@@ -140,24 +117,14 @@
             "type": "integer",
             "format": "int32"
           },
-          "name": {
-            "type": "string"
-          }
-        }
-      },
-      "Dummy": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "name": {
+          "title": {
             "type": "string"
           },
-          "decimalProperty": {
-            "type": "number",
-            "format": "double"
+          "assignee": {
+            "type": "string"
+          },
+          "isCompleted": {
+            "type": "boolean"
           }
         }
       }
@@ -166,9 +133,6 @@
   "tags": [
     {
       "name": "WebApi"
-    },
-    {
-      "name": "DemoEndpoints"
     }
   ]
 }

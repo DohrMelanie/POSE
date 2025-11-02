@@ -7,24 +7,25 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
-import { Dummy } from '../../models/dummy';
 
-export interface DummiesGet$Params {
+export interface ItemsIdDelete$Params {
+  id: number;
 }
 
-export function dummiesGet(http: HttpClient, rootUrl: string, params?: DummiesGet$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<Dummy>>> {
-  const rb = new RequestBuilder(rootUrl, dummiesGet.PATH, 'get');
+export function itemsIdDelete(http: HttpClient, rootUrl: string, params: ItemsIdDelete$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
+  const rb = new RequestBuilder(rootUrl, itemsIdDelete.PATH, 'delete');
   if (params) {
+    rb.path('id', params.id, {});
   }
 
   return http.request(
-    rb.build({ responseType: 'json', accept: 'application/json', context })
+    rb.build({ responseType: 'text', accept: '*/*', context })
   ).pipe(
     filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
     map((r: HttpResponse<any>) => {
-      return r as StrictHttpResponse<Array<Dummy>>;
+      return (r as HttpResponse<any>).clone({ body: undefined }) as StrictHttpResponse<void>;
     })
   );
 }
 
-dummiesGet.PATH = '/dummies';
+itemsIdDelete.PATH = '/items/{id}';
