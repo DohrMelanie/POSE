@@ -1,0 +1,29 @@
+Prog - Mitschrift; von Melanie Dohr; am 24.10.2025
+
+Pfad umstellen im appsettings bei AppHost
+npm i im Frontend und FrontendTests
+
+dotnet build
+dotnet test
+
+AppServices: DB Access Layer und Business Logic
+
+.Produces und so schreiben fürs richtige Swagger File
+
+Beweisen bei Matura, dass man mit großem Projekt umgehen kann
+
+Theory: führt Test mehrfach aus
+
+Teil der Tests gegeben, Teil selber schreiben
+
+Fixtures: Init Code vor Tests (DatabaseFixture ist gegeben)
+Test: Arrange, Act, Assert
+
+import aus csv kommt immer -> in AppServices
+
+CsvParserTests muss man schreiben können
+
+unbedingt signals, @for, @if
+kein tailwind :(
+
+LF ziemlich wie TodoList
