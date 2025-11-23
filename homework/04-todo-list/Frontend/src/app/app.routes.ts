@@ -1,9 +1,7 @@
 import { Routes } from '@angular/router';
-import { DummiesList } from './dummies-list/dummies-list';
-import { GenerateRecords } from './generate-records/generate-records';
+import { Todolist } from './todolist/todolist';
 
 export const routes: Routes = [
-    { path: 'dummies', component: DummiesList },
-    { path: 'generate', component: GenerateRecords },
-    { path: '', redirectTo: '/dummies', pathMatch: 'full' }
+    { path: 'todos', component: Todolist },
+    { path: '', redirectTo: '/todos', pathMatch: 'full' }
 ];

@@ -6,16 +6,16 @@ namespace ImporterTests;
 public class DataImporterTests
 {
     private readonly IFileReader fileReader;
-    private readonly IDummyCsvParser csvParser;
+    private readonly ITodoItemsTxtParser txtParser;
     private readonly ITodoItemsImportDatabaseWriter databaseWriter;
     private readonly TodoItemsImporter importer;
 
     public DataImporterTests()
     {
         fileReader = Substitute.For<IFileReader>();
-        csvParser = Substitute.For<IDummyCsvParser>();
+        txtParser = Substitute.For<ITodoItemsTxtParser>();
         databaseWriter = Substitute.For<ITodoItemsImportDatabaseWriter>();
-        importer = new TodoItemsImporter(fileReader, csvParser, databaseWriter);
+        importer = new TodoItemsImporter(fileReader, txtParser, databaseWriter);
     }
 
     [Fact]
@@ -30,7 +30,7 @@ public class DataImporterTests
         };
 
         fileReader.ReadAllTextAsync(csvFilePath).Returns(Task.FromResult(csvContent));
-        csvParser.ParseCsv(csvContent).Returns(dummies);
+        txtParser.ParseTxt(csvContent).Returns(dummies);
 
         // Act
         var result = await importer.ImportFromCsvAsync(csvFilePath, isDryRun: false);
@@ -58,7 +58,7 @@ public class DataImporterTests
         };
 
         fileReader.ReadAllTextAsync(csvFilePath).Returns(Task.FromResult(csvContent));
-        csvParser.ParseCsv(csvContent).Returns(dummies);
+        txtParser.ParseTxt(csvContent).Returns(dummies);
 
         // Act
         var result = await importer.ImportFromCsvAsync(csvFilePath, isDryRun: true);
@@ -96,7 +96,7 @@ public class DataImporterTests
         var expectedException = new InvalidOperationException("Invalid CSV");
 
         fileReader.ReadAllTextAsync(csvFilePath).Returns(Task.FromResult(csvContent));
-        csvParser.ParseCsv(csvContent).Throws(expectedException);
+        txtParser.ParseTxt(csvContent).Throws(expectedException);
 
         // Act & Assert
         await Assert.ThrowsAsync<InvalidOperationException>(
@@ -117,7 +117,7 @@ public class DataImporterTests
         var dummies = new List<TodoItem>();
 
         fileReader.ReadAllTextAsync(csvFilePath).Returns(Task.FromResult(csvContent));
-        csvParser.ParseCsv(csvContent).Returns(dummies);
+        txtParser.ParseTxt(csvContent).Returns(dummies);
 
         // Act
         var result = await importer.ImportFromCsvAsync(csvFilePath, isDryRun: false);
@@ -137,7 +137,7 @@ public class DataImporterTests
         var dummies = new List<TodoItem> { new() { Assignee = "Test1", Title = "TestTitle" } };
 
         fileReader.ReadAllTextAsync(csvFilePath).Returns(Task.FromResult(csvContent));
-        csvParser.ParseCsv(csvContent).Returns(dummies);
+        txtParser.ParseTxt(csvContent).Returns(dummies);
 
         // Act
         await importer.ImportFromCsvAsync(csvFilePath, isDryRun: false);
@@ -148,7 +148,7 @@ public class DataImporterTests
             await databaseWriter.BeginTransactionAsync();
             await databaseWriter.ClearAllAsync();
             await fileReader.ReadAllTextAsync(csvFilePath);
-            csvParser.ParseCsv(csvContent);
+            txtParser.ParseTxt(csvContent);
             await databaseWriter.WriteTodoItemsAsync(Arg.Any<IEnumerable<TodoItem>>());
             await databaseWriter.CommitTransactionAsync();
         });

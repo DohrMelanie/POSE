@@ -8,18 +8,18 @@ public interface ITodoItemsImporter
     /// <summary>
     /// Imports data from a CSV file
     /// </summary>
-    /// <param name="csvFilePath">Path to the CSV file</param>
+    /// <param name="txtFilePath">Path to the TXT file</param>
     /// <param name="isDryRun">If true, rollback transaction after import</param>
     /// <returns>Number of records imported</returns>
-    Task<int> ImportFromCsvAsync(string csvFilePath, bool isDryRun = false);
+    Task<int> ImportFromCsvAsync(string txtFilePath, bool isDryRun = false);
 }
 
 /// <summary>
 /// Implementation for importing data from CSV files
 /// </summary>
-public class TodoItemsImporter(IFileReader fileReader, IDummyCsvParser csvParser, ITodoItemsImportDatabaseWriter databaseWriter) : ITodoItemsImporter
+public class TodoItemsImporter(IFileReader fileReader, ITodoItemsTxtParser txtParser, ITodoItemsImportDatabaseWriter databaseWriter) : ITodoItemsImporter
 {
-    public async Task<int> ImportFromCsvAsync(string csvFilePath, bool isDryRun = false)
+    public async Task<int> ImportFromCsvAsync(string txtFilePath, bool isDryRun = false)
     {
         await databaseWriter.BeginTransactionAsync();
 
@@ -28,11 +28,11 @@ public class TodoItemsImporter(IFileReader fileReader, IDummyCsvParser csvParser
             // Clear existing data
             await databaseWriter.ClearAllAsync();
 
-            // Read CSV file
-            var csvContent = await fileReader.ReadAllTextAsync(csvFilePath);
+            // Read TXT file
+            var txtContent = await fileReader.ReadAllTextAsync(txtFilePath);
 
-            // Parse CSV content
-            var items = csvParser.ParseCsv(csvContent).ToList();
+            // Parse TXT content
+            var items = txtParser.ParseTxt(txtContent).ToList();
 
             // Write to database
             await databaseWriter.WriteTodoItemsAsync(items);

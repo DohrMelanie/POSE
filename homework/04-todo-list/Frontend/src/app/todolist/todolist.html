@@ -1,0 +1,69 @@
+<h2>Todo List</h2>
+
+<div class="add-todo-form">
+  <h3>Add New Todo</h3>
+  <div class="form-group">
+    <input 
+      type="text" 
+      placeholder="Title" 
+      [(ngModel)]="newTodoTitle"
+      class="form-input"
+    />
+    <input 
+      type="text" 
+      placeholder="Assignee" 
+      [(ngModel)]="newTodoAssignee"
+      class="form-input"
+    />
+    <button (click)="addTodo()" class="btn-add">Add Todo</button>
+  </div>
+</div>
+
+<div class="todos-container">
+  @if (todos().length > 0) {
+    <table class="todos-table">
+      <thead>
+        <tr>
+          <th>Completed</th>
+          <th>Title</th>
+          <th>Assignee</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (todo of todos(); track todo.id) {
+          <tr>
+            <td>
+              <input 
+                type="checkbox" 
+                [checked]="todo.isCompleted"
+                (change)="toggleComplete(todo)"
+              />
+            </td>
+            <td>
+              <input 
+                type="text" 
+                [(ngModel)]="todo.title"
+                (blur)="updateTodo(todo)"
+                class="edit-input"
+              />
+            </td>
+            <td>
+              <input 
+                type="text" 
+                [(ngModel)]="todo.assignee"
+                (blur)="updateTodo(todo)"
+                class="edit-input"
+              />
+            </td>
+            <td>
+              <button (click)="deleteTodo(todo.id)" class="btn-delete">Delete</button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  } @else {
+    <p>No todos yet. Add one above!</p>
+  }
+</div>

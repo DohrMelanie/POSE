@@ -3,24 +3,24 @@ namespace AppServices.Importer;
 /// <summary>
 /// Interface for parsing CSV content into objects
 /// </summary>
-public interface IDummyCsvParser
+public interface ITodoItemsTxtParser
 {
     /// <summary>
-    /// Parses CSV content into a list of Dummy objects
+    /// Parses TXT content into a list of todos
     /// </summary>
-    /// <param name="csvContent">CSV content as string</param>
+    /// <param name="txtContent">TXT content as string</param>
     /// <returns>List of parsed Dummy objects</returns>
-    IEnumerable<TodoItem> ParseCsv(string csvContent);
+    IEnumerable<TodoItem> ParseTxt(string txtContent);
 }
 
 /// <summary>
 /// Implementation for parsing CSV content into Dummy objects
 /// </summary>
-public class TodoItemsTxtParser : IDummyCsvParser
+public class TodoItemsTxtParser : ITodoItemsTxtParser
 {
-    public IEnumerable<TodoItem> ParseCsv(string csvContent)
+    public IEnumerable<TodoItem> ParseTxt(string txtContent)
     {
-        var lines = csvContent.Split('\n', StringSplitOptions.RemoveEmptyEntries)
+        var lines = txtContent.Split('\n', StringSplitOptions.RemoveEmptyEntries)
             .Select(l => l.Trim())
             .Where(l => !string.IsNullOrWhiteSpace(l))
             .ToArray();
@@ -34,9 +34,8 @@ public class TodoItemsTxtParser : IDummyCsvParser
         var assignee = string.Empty;
         
         // Parse data
-        for (var i = 1; i < lines.Length; i++)
+        foreach (var line in lines)
         {
-            var line = lines[i];
             if (line.StartsWith("Assignee: "))
             {
                 assignee = line.Replace("Assignee: ", "");

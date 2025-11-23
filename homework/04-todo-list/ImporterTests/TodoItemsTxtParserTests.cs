@@ -7,13 +7,13 @@ public class TodoItemsTxtParserTests
     private readonly TodoItemsTxtParser parser = new();
 
     [Fact]
-    public void ParseCsv_ValidContent_ReturnsListOfDummies()
+    public void ParseTxt_ValidContent_ReturnsListOfDummies()
     {
         // Arrange
-        var csvContent = "Assignee: Rainer\nTodos:\n* Shopping\n* Prepare";
+        var txtContent = "Assignee: Rainer\nTodos:\n* Shopping\n* Prepare";
 
         // Act
-        var result = parser.ParseCsv(csvContent).ToList();
+        var result = parser.ParseTxt(txtContent).ToList();
 
         // Assert
         Assert.Equal(2, result.Count);
@@ -24,49 +24,49 @@ public class TodoItemsTxtParserTests
     }
 
     [Fact]
-    public void ParseCsv_EmptyContent_ThrowsInvalidOperationException()
+    public void ParseTxt_EmptyContent_ThrowsInvalidOperationException()
     {
         // Arrange
-        var csvContent = "";
+        var txtContent = "";
 
         // Act & Assert
         var exception = Assert.Throws<InvalidOperationException>(
-            () => parser.ParseCsv(csvContent));
+            () => parser.ParseTxt(txtContent));
         Assert.Contains("empty", exception.Message, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
-    public void ParseCsv_InvalidHeader_ThrowsInvalidOperationException()
+    public void ParseTxt_InvalidHeader_ThrowsInvalidOperationException()
     {
         // Arrange
-        var csvContent = "Assignee: Rainer\nTodos:\n* Shopping\n* Prepare";
+        var txtContent = "Assignee: Rainer\nTodos:\n* Shopping\n* Prepare";
 
         // Act & Assert
         var exception = Assert.Throws<InvalidOperationException>(
-            () => parser.ParseCsv(csvContent));
-        Assert.Contains("Invalid CSV header", exception.Message);
+            () => parser.ParseTxt(txtContent));
+        Assert.Contains("Invalid TXT header", exception.Message);
     }
 
     [Fact]
-    public void ParseCsv_InsufficientColumns_ThrowsInvalidOperationException()
+    public void ParseTxt_InsufficientColumns_ThrowsInvalidOperationException()
     {
         // Arrange
-        var csvContent = "Assignee: Test";
+        var txtContent = "Assignee: Test";
 
         // Act & Assert
         var exception = Assert.Throws<InvalidOperationException>(
-            () => parser.ParseCsv(csvContent));
+            () => parser.ParseTxt(txtContent));
         Assert.Contains("insufficient content", exception.Message, StringComparison.OrdinalIgnoreCase);
     }
     
     [Fact]
-    public void ParseCsv_SkipsEmptyLines_ReturnsValidDummies()
+    public void ParseTxt_SkipsEmptyLines_ReturnsValidDummies()
     {
         // Arrange
-        var csvContent = "Assignee: Test\n\n   \n* Test1\n* Test2";
+        var txtContent = "Assignee: Test\n\n   \n* Test1\n* Test2";
 
         // Act
-        var result = parser.ParseCsv(csvContent).ToList();
+        var result = parser.ParseTxt(txtContent).ToList();
 
         // Assert
         Assert.Equal(2, result.Count);

@@ -79,7 +79,7 @@ static void ConfigureServices(IServiceCollection services, IConfiguration config
 
     // Register application services
     services.AddScoped<IFileReader, FileReader>();
-    services.AddScoped<IDummyCsvParser, TodoItemsTxtParser>();
+    services.AddScoped<ITodoItemsTxtParser, TodoItemsTxtParser>();
     services.AddScoped<ITodoItemsImportDatabaseWriter, TodoItemsImportDatabaseWriter>();
     services.AddScoped<ITodoItemsImporter, TodoItemsImporter>();
 }
