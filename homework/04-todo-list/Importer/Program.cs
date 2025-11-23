@@ -25,9 +25,9 @@ try
     var parsedArgs = parser.Parse(args);
 
     // Validate file exists
-    if (!File.Exists(parsedArgs.CsvFilePath))
+    if (!File.Exists(parsedArgs.TxtFilePath))
     {
-        Console.Error.WriteLine($"Error: File '{parsedArgs.CsvFilePath}' not found.");
+        Console.Error.WriteLine($"Error: File '{parsedArgs.TxtFilePath}' not found.");
         return 1;
     }
 
@@ -35,7 +35,7 @@ try
     var importer = host.Services.GetRequiredService<ITodoItemsImporter>();
 
     // Perform the import
-    var importedCount = await importer.ImportFromCsvAsync(parsedArgs.CsvFilePath, parsedArgs.IsDryRun);
+    var importedCount = await importer.ImportFromTxtAsync(parsedArgs.TxtFilePath, parsedArgs.IsDryRun);
 
     Console.WriteLine($"\nSuccessfully imported {importedCount} record(s).");
 

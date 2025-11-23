@@ -13,4 +13,14 @@ public class TodoListIntegrationTests(WebApiTestFixture fixture) : IClassFixture
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
+
+    [Fact]
+    public async Task PostTodoItem_ReturnsCreated()
+    {
+        var response = await fixture.HttpClient.PostAsync("/items", new StringContent(""));
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+    }
+    
+    [Fact]
+    public 
 }

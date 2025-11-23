@@ -1,7 +1,7 @@
 namespace AppServices.Importer;
 
 /// <summary>
-/// Interface for parsing CSV content into objects
+/// Interface for parsing TXT content into objects
 /// </summary>
 public interface ITodoItemsTxtParser
 {
@@ -14,7 +14,7 @@ public interface ITodoItemsTxtParser
 }
 
 /// <summary>
-/// Implementation for parsing CSV content into Dummy objects
+/// Implementation for parsing TXT content into Dummy objects
 /// </summary>
 public class TodoItemsTxtParser : ITodoItemsTxtParser
 {
@@ -28,6 +28,11 @@ public class TodoItemsTxtParser : ITodoItemsTxtParser
         if (lines.Length == 0)
         {
             throw new InvalidOperationException("TXT content is empty.");
+        }
+
+        if (!lines[0].StartsWith("Assignee:"))
+        {
+            throw new InvalidOperationException("Invalid TXT header");
         }
 
         var items = new List<TodoItem>();

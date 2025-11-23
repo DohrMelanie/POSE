@@ -17,9 +17,9 @@ public class TodoItemsTxtParserTests
 
         // Assert
         Assert.Equal(2, result.Count);
-        Assert.Equal("Test1", result[0].Assignee);
+        Assert.Equal("Rainer", result[0].Assignee);
         Assert.Equal("Shopping", result[0].Title);
-        Assert.Equal("Test2", result[1].Assignee);
+        Assert.Equal("Rainer", result[1].Assignee);
         Assert.Equal("Prepare", result[1].Title);
     }
 
@@ -39,7 +39,7 @@ public class TodoItemsTxtParserTests
     public void ParseTxt_InvalidHeader_ThrowsInvalidOperationException()
     {
         // Arrange
-        var txtContent = "Assignee: Rainer\nTodos:\n* Shopping\n* Prepare";
+        var txtContent = "Halloooo\nAssignee: Rainer\nTodos:\n* Shopping\n* Prepare";
 
         // Act & Assert
         var exception = Assert.Throws<InvalidOperationException>(

@@ -19,21 +19,21 @@ public class DataImporterTests
     }
 
     [Fact]
-    public async Task ImportFromCsvAsync_SuccessfulImport_ReturnsCount()
+    public async Task ImportFromTxtAsync_SuccessfulImport_ReturnsCount()
     {
         // Arrange
-        var csvFilePath = "test.csv";
-        var csvContent = "Assignee: Rainer\nTodos:\n* Shopping";
+        var txtFilePath = "test.txt";
+        var txtContent = "Assignee: Rainer\nTodos:\n* Shopping";
         var dummies = new List<TodoItem>
         {
             new() { Assignee = "Rainer", Title = "Shopping" }
         };
 
-        fileReader.ReadAllTextAsync(csvFilePath).Returns(Task.FromResult(csvContent));
-        txtParser.ParseTxt(csvContent).Returns(dummies);
+        fileReader.ReadAllTextAsync(txtFilePath).Returns(Task.FromResult(txtContent));
+        txtParser.ParseTxt(txtContent).Returns(dummies);
 
         // Act
-        var result = await importer.ImportFromCsvAsync(csvFilePath, isDryRun: false);
+        var result = await importer.ImportFromTxtAsync(txtFilePath, isDryRun: false);
 
         // Assert
         Assert.Equal(1, result);
@@ -45,11 +45,11 @@ public class DataImporterTests
     }
 
     [Fact]
-    public async Task ImportFromCsvAsync_DryRun_RollsBackTransaction()
+    public async Task ImportFromTxtAsync_DryRun_RollsBackTransaction()
     {
         // Arrange
-        var csvFilePath = "test.csv";
-        var csvContent = "Assignee: Rainer\nTodos:\n* Shopping\n* Prepare lecture\n---\nAssignee: Karin\n Todos:\n* Practice the Piano";
+        var txtFilePath = "test.txt";
+        var txtContent = "Assignee: Rainer\nTodos:\n* Shopping\n* Prepare lecture\n---\nAssignee: Karin\n Todos:\n* Practice the Piano";
         var dummies = new List<TodoItem>
         {
             new() { Assignee = "Rainer", Title = "Shopping" },
@@ -57,30 +57,30 @@ public class DataImporterTests
             new() { Assignee = "Karin", Title = "Practice the Piano" }
         };
 
-        fileReader.ReadAllTextAsync(csvFilePath).Returns(Task.FromResult(csvContent));
-        txtParser.ParseTxt(csvContent).Returns(dummies);
+        fileReader.ReadAllTextAsync(txtFilePath).Returns(Task.FromResult(txtContent));
+        txtParser.ParseTxt(txtContent).Returns(dummies);
 
         // Act
-        var result = await importer.ImportFromCsvAsync(csvFilePath, isDryRun: true);
+        var result = await importer.ImportFromTxtAsync(txtFilePath, isDryRun: true);
 
         // Assert
-        Assert.Equal(2, result);
+        Assert.Equal(3, result);
         await databaseWriter.Received(1).BeginTransactionAsync();
         await databaseWriter.Received(1).RollbackTransactionAsync();
         await databaseWriter.DidNotReceive().CommitTransactionAsync();
     }
 
     [Fact]
-    public async Task ImportFromCsvAsync_FileReaderThrows_RollsBackAndRethrows()
+    public async Task ImportFromTxtAsync_FileReaderThrows_RollsBackAndRethrows()
     {
         // Arrange
-        var csvFilePath = "test.csv";
+        var txtFilePath = "test.txt";
         var expectedException = new FileNotFoundException("File not found");
-        fileReader.ReadAllTextAsync(csvFilePath).Throws(expectedException);
+        fileReader.ReadAllTextAsync(txtFilePath).Throws(expectedException);
 
         // Act & Assert
         await Assert.ThrowsAsync<FileNotFoundException>(
-            async () => await importer.ImportFromCsvAsync(csvFilePath));
+            async () => await importer.ImportFromTxtAsync(txtFilePath));
 
         await databaseWriter.Received(1).BeginTransactionAsync();
         await databaseWriter.Received(1).RollbackTransactionAsync();
@@ -88,19 +88,19 @@ public class DataImporterTests
     }
 
     [Fact]
-    public async Task ImportFromCsvAsync_CsvParserThrows_RollsBackAndRethrows()
+    public async Task ImportFromTxtAsync_TxtParserThrows_RollsBackAndRethrows()
     {
         // Arrange
-        var csvFilePath = "test.csv";
-        var csvContent = "Invalid content";
-        var expectedException = new InvalidOperationException("Invalid CSV");
+        var txtFilePath = "test.txt";
+        var txtContent = "Invalid content";
+        var expectedException = new InvalidOperationException("Invalid TXT");
 
-        fileReader.ReadAllTextAsync(csvFilePath).Returns(Task.FromResult(csvContent));
-        txtParser.ParseTxt(csvContent).Throws(expectedException);
+        fileReader.ReadAllTextAsync(txtFilePath).Returns(Task.FromResult(txtContent));
+        txtParser.ParseTxt(txtContent).Throws(expectedException);
 
         // Act & Assert
         await Assert.ThrowsAsync<InvalidOperationException>(
-            async () => await importer.ImportFromCsvAsync(csvFilePath));
+            async () => await importer.ImportFromTxtAsync(txtFilePath));
 
         await databaseWriter.Received(1).BeginTransactionAsync();
         await databaseWriter.Received(1).RollbackTransactionAsync();
@@ -109,18 +109,18 @@ public class DataImporterTests
     
 
     [Fact]
-    public async Task ImportFromCsvAsync_EmptyFile_ReturnsZero()
+    public async Task ImportFromTxtAsync_EmptyFile_ReturnsZero()
     {
         // Arrange
-        var csvFilePath = "test.csv";
-        var csvContent = "Assignee: Rainer\n";
+        var txtFilePath = "test.txt";
+        var txtContent = "Assignee: Rainer\n";
         var dummies = new List<TodoItem>();
 
-        fileReader.ReadAllTextAsync(csvFilePath).Returns(Task.FromResult(csvContent));
-        txtParser.ParseTxt(csvContent).Returns(dummies);
+        fileReader.ReadAllTextAsync(txtFilePath).Returns(Task.FromResult(txtContent));
+        txtParser.ParseTxt(txtContent).Returns(dummies);
 
         // Act
-        var result = await importer.ImportFromCsvAsync(csvFilePath, isDryRun: false);
+        var result = await importer.ImportFromTxtAsync(txtFilePath, isDryRun: false);
 
         // Assert
         Assert.Equal(0, result);
@@ -129,26 +129,26 @@ public class DataImporterTests
     }
 
     [Fact]
-    public async Task ImportFromCsvAsync_CallsServicesInCorrectOrder()
+    public async Task ImportFromTxtAsync_CallsServicesInCorrectOrder()
     {
         // Arrange
-        var csvFilePath = "test.csv";
-        var csvContent = "Assignee: Rainer\nTodos:\n* Shopping";
+        var txtFilePath = "test.txt";
+        var txtContent = "Assignee: Rainer\nTodos:\n* Shopping";
         var dummies = new List<TodoItem> { new() { Assignee = "Test1", Title = "TestTitle" } };
 
-        fileReader.ReadAllTextAsync(csvFilePath).Returns(Task.FromResult(csvContent));
-        txtParser.ParseTxt(csvContent).Returns(dummies);
+        fileReader.ReadAllTextAsync(txtFilePath).Returns(Task.FromResult(txtContent));
+        txtParser.ParseTxt(txtContent).Returns(dummies);
 
         // Act
-        await importer.ImportFromCsvAsync(csvFilePath, isDryRun: false);
+        await importer.ImportFromTxtAsync(txtFilePath, isDryRun: false);
 
         // Assert - Verify order of calls
         Received.InOrder(async () =>
         {
             await databaseWriter.BeginTransactionAsync();
             await databaseWriter.ClearAllAsync();
-            await fileReader.ReadAllTextAsync(csvFilePath);
-            txtParser.ParseTxt(csvContent);
+            await fileReader.ReadAllTextAsync(txtFilePath);
+            txtParser.ParseTxt(txtContent);
             await databaseWriter.WriteTodoItemsAsync(Arg.Any<IEnumerable<TodoItem>>());
             await databaseWriter.CommitTransactionAsync();
         });

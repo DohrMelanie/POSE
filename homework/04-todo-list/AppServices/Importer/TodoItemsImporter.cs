@@ -1,25 +1,25 @@
 namespace AppServices.Importer;
 
 /// <summary>
-/// Interface for importing data from CSV files
+/// Interface for importing data from TXT files
 /// </summary>
 public interface ITodoItemsImporter
 {
     /// <summary>
-    /// Imports data from a CSV file
+    /// Imports data from a TXT file
     /// </summary>
     /// <param name="txtFilePath">Path to the TXT file</param>
     /// <param name="isDryRun">If true, rollback transaction after import</param>
     /// <returns>Number of records imported</returns>
-    Task<int> ImportFromCsvAsync(string txtFilePath, bool isDryRun = false);
+    Task<int> ImportFromTxtAsync(string txtFilePath, bool isDryRun = false);
 }
 
 /// <summary>
-/// Implementation for importing data from CSV files
+/// Implementation for importing data from TXT files
 /// </summary>
 public class TodoItemsImporter(IFileReader fileReader, ITodoItemsTxtParser txtParser, ITodoItemsImportDatabaseWriter databaseWriter) : ITodoItemsImporter
 {
-    public async Task<int> ImportFromCsvAsync(string txtFilePath, bool isDryRun = false)
+    public async Task<int> ImportFromTxtAsync(string txtFilePath, bool isDryRun = false)
     {
         await databaseWriter.BeginTransactionAsync();
 

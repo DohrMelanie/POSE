@@ -10,13 +10,13 @@ public class CommandLineParserTests
     public void Parse_ValidArguments_ReturnsCorrectResult()
     {
         // Arrange
-        var args = new[] { "test.csv" };
+        var args = new[] { "test.txt" };
 
         // Act
         var result = parser.Parse(args);
 
         // Assert
-        Assert.Equal("test.csv", result.CsvFilePath);
+        Assert.Equal("test.txt", result.TxtFilePath);
         Assert.False(result.IsDryRun);
     }
 
@@ -24,13 +24,13 @@ public class CommandLineParserTests
     public void Parse_WithDryRunFlag_ReturnsDryRunTrue()
     {
         // Arrange
-        var args = new[] { "test.csv", "--dry-run" };
+        var args = new[] { "test.txt", "--dry-run" };
 
         // Act
         var result = parser.Parse(args);
 
         // Assert
-        Assert.Equal("test.csv", result.CsvFilePath);
+        Assert.Equal("test.txt", result.TxtFilePath);
         Assert.True(result.IsDryRun);
     }
 
@@ -42,7 +42,7 @@ public class CommandLineParserTests
 
         // Act & Assert
         var exception = Assert.Throws<ArgumentException>(() => parser.Parse(args));
-        Assert.Contains("provide a CSV file path", exception.Message);
+        Assert.Contains("provide a TXT file path", exception.Message);
         Assert.Contains("Usage:", exception.Message);
     }
 
@@ -50,13 +50,13 @@ public class CommandLineParserTests
     public void Parse_DryRunFlagInMiddle_ReturnsDryRunTrue()
     {
         // Arrange
-        var args = new[] { "test.csv", "--dry-run", "extra" };
+        var args = new[] { "test.txt", "--dry-run", "extra" };
 
         // Act
         var result = parser.Parse(args);
 
         // Assert
-        Assert.Equal("test.csv", result.CsvFilePath);
+        Assert.Equal("test.txt", result.TxtFilePath);
         Assert.True(result.IsDryRun);
     }
 
@@ -64,13 +64,13 @@ public class CommandLineParserTests
     public void Parse_DryRunFlagAtEnd_ReturnsDryRunTrue()
     {
         // Arrange
-        var args = new[] { "test.csv", "other", "--dry-run" };
+        var args = new[] { "test.txt", "other", "--dry-run" };
 
         // Act
         var result = parser.Parse(args);
 
         // Assert
-        Assert.Equal("test.csv", result.CsvFilePath);
+        Assert.Equal("test.txt", result.TxtFilePath);
         Assert.True(result.IsDryRun);
     }
 
@@ -78,13 +78,13 @@ public class CommandLineParserTests
     public void Parse_WithInvalidFlag_IgnoresIt()
     {
         // Arrange
-        var args = new[] { "test.csv", "--invalid-flag" };
+        var args = new[] { "test.txt", "--invalid-flag" };
 
         // Act
         var result = parser.Parse(args);
 
         // Assert
-        Assert.Equal("test.csv", result.CsvFilePath);
+        Assert.Equal("test.txt", result.TxtFilePath);
         Assert.False(result.IsDryRun);
     }
 
@@ -92,8 +92,8 @@ public class CommandLineParserTests
     public void Parse_DryRunCaseSensitive_OnlyLowercaseWorks()
     {
         // Arrange
-        var argsUpperCase = new[] { "test.csv", "--DRY-RUN" };
-        var argsMixedCase = new[] { "test.csv", "--Dry-Run" };
+        var argsUpperCase = new[] { "test.txt", "--DRY-RUN" };
+        var argsMixedCase = new[] { "test.txt", "--Dry-Run" };
 
         // Act
         var resultUpperCase = parser.Parse(argsUpperCase);
