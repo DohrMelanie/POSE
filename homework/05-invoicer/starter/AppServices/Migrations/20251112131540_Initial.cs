@@ -17,7 +17,7 @@ namespace AppServices.Migrations
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    EmplyeeId = table.Column<string>(type: "TEXT", maxLength: 5, nullable: false),
+                    EmployeeId = table.Column<string>(type: "TEXT", maxLength: 5, nullable: false),
                     EmployeeName = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false)
                 },
                 constraints: table =>

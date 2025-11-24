@@ -34,7 +34,7 @@ public class TimesheetImporterTests
                 StartTime = new TimeOnly(8, 0),
                 EndTime = new TimeOnly(12, 0),
                 Description = "Meeting",
-                Employee = new Employee { EmplyeeId = "12345", EmployeeName = "John Doe" },
+                Employee = new Employee { EmployeeId = "12345", EmployeeName = "John Doe" },
                 Project = new Project { ProjectCode = "PROJ1" }
             }
         };
@@ -74,7 +74,7 @@ public class TimesheetImporterTests
                 StartTime = new TimeOnly(8, 0),
                 EndTime = new TimeOnly(12, 0),
                 Description = "Meeting",
-                Employee = new Employee { EmplyeeId = "12345", EmployeeName = "John Doe" },
+                Employee = new Employee { EmployeeId = "12345", EmployeeName = "John Doe" },
                 Project = new Project { ProjectCode = "PROJ1" }
             }
         };
@@ -151,7 +151,7 @@ public class TimesheetImporterTests
                 StartTime = new TimeOnly(8, 0),
                 EndTime = new TimeOnly(12, 0),
                 Description = "Meeting",
-                Employee = new Employee { EmplyeeId = "12345", EmployeeName = "John Doe" },
+                Employee = new Employee { EmployeeId = "12345", EmployeeName = "John Doe" },
                 Project = new Project { ProjectCode = "PROJ1" }
             }
         };
@@ -204,7 +204,7 @@ public class TimesheetImporterTests
         var csvContent = "EMP-ID: 12345\nEMP-NAME: John Doe\nTIMESHEETS: 2024-01-15\n08:00;12:00;\"Meeting\";PROJ1\n13:00;17:00;\"Development\";PROJ2";
         var existingEmployees = new List<Employee>();
         var existingProjects = new List<Project>();
-        var employee = new Employee { EmplyeeId = "12345", EmployeeName = "John Doe" };
+        var employee = new Employee { EmployeeId = "12345", EmployeeName = "John Doe" };
         var timeEntries = new List<TimeEntry>
         {
             new()
@@ -249,7 +249,7 @@ public class TimesheetImporterTests
         var csvContent = "EMP-ID: 12345\nEMP-NAME: John Doe\nTIMESHEETS: 2024-01-15\n08:00;12:00;\"Meeting\";PROJ1\nTIMESHEETS: 2024-01-16\n09:00;13:00;\"Development\";PROJ2";
         var existingEmployees = new List<Employee>();
         var existingProjects = new List<Project>();
-        var employee = new Employee { EmplyeeId = "12345", EmployeeName = "John Doe" };
+        var employee = new Employee { EmployeeId = "12345", EmployeeName = "John Doe" };
         var timeEntries = new List<TimeEntry>
         {
             new()
@@ -303,7 +303,7 @@ public class TimesheetImporterTests
                 StartTime = new TimeOnly(8, 0),
                 EndTime = new TimeOnly(12, 0),
                 Description = "Meeting",
-                Employee = new Employee { EmplyeeId = "12345", EmployeeName = "John Doe" },
+                Employee = new Employee { EmployeeId = "12345", EmployeeName = "John Doe" },
                 Project = new Project { ProjectCode = "PROJ1" }
             }
         };
@@ -340,7 +340,7 @@ public class TimesheetImporterTests
                 StartTime = new TimeOnly(8, 0),
                 EndTime = new TimeOnly(12, 0),
                 Description = "Meeting",
-                Employee = new Employee { EmplyeeId = "12345", EmployeeName = "John Doe" },
+                Employee = new Employee { EmployeeId = "12345", EmployeeName = "John Doe" },
                 Project = new Project { ProjectCode = "PROJ1" }
             }
         };
@@ -375,7 +375,7 @@ public class TimesheetImporterTests
         var csvContent = "EMP-ID: 12345\nEMP-NAME: John Doe\nTIMESHEETS: 2024-01-15\n08:00;12:00;\"Meeting\";PROJ1";
         var existingEmployees = new List<Employee>
         {
-            new() { Id = 1, EmplyeeId = "99999", EmployeeName = "Jane Smith" }
+            new() { Id = 1, EmployeeId = "99999", EmployeeName = "Jane Smith" }
         };
         var existingProjects = new List<Project>
         {
@@ -389,7 +389,7 @@ public class TimesheetImporterTests
                 StartTime = new TimeOnly(8, 0),
                 EndTime = new TimeOnly(12, 0),
                 Description = "Meeting",
-                Employee = new Employee { EmplyeeId = "12345", EmployeeName = "John Doe" },
+                Employee = new Employee { EmployeeId = "12345", EmployeeName = "John Doe" },
                 Project = new Project { ProjectCode = "PROJ1" }
             }
         };
@@ -405,7 +405,7 @@ public class TimesheetImporterTests
         // Assert
         csvParser.Received(1).ParseCsv(
             csvContent,
-            Arg.Is<IEnumerable<Employee>>(e => e.Count() == 1 && e.First().EmplyeeId == "99999"),
+            Arg.Is<IEnumerable<Employee>>(e => e.Count() == 1 && e.First().EmployeeId == "99999"),
             Arg.Is<IEnumerable<Project>>(p => p.Count() == 1 && p.First().ProjectCode == "EXISTINGPROJ")
         );
     }

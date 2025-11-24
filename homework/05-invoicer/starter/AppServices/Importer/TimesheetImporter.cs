@@ -38,7 +38,7 @@ public class TimesheetImporter(IFileReader fileReader, ITimesheetParser csvParse
 
             var timesheets = csvParser.ParseCsv(timesheetText, existingEmployees, existingProjects).ToList();
             // Clear existing data
-            var employeeDates = timesheets.GroupBy(t => (t.Employee!.EmplyeeId, t.Date)).Select(g => g.Key);
+            var employeeDates = timesheets.GroupBy(t => (t.Employee!.EmployeeId, t.Date)).Select(g => g.Key);
             foreach(var (employeeId, date) in employeeDates)
             {
                 await databaseWriter.ClearDayAsync(employeeId, date);

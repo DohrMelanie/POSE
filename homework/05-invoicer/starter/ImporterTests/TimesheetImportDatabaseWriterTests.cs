@@ -14,8 +14,8 @@ public class TimesheetImportDatabaseWriterTests(DatabaseFixture fixture)
         // Arrange
         await using (var context = new ApplicationDataContext(fixture.Options))
         {
-            var employee1 = new Employee { EmplyeeId = "E001", EmployeeName = "John Doe" };
-            var employee2 = new Employee { EmplyeeId = "E002", EmployeeName = "Jane Smith" };
+            var employee1 = new Employee { EmployeeId = "E001", EmployeeName = "John Doe" };
+            var employee2 = new Employee { EmployeeId = "E002", EmployeeName = "Jane Smith" };
             var project = new Project { ProjectCode = "PRJ001" };
             
             context.Employees.AddRange(employee1, employee2);
@@ -69,9 +69,9 @@ public class TimesheetImportDatabaseWriterTests(DatabaseFixture fixture)
         {
             var entries = await context.TimeEntries.Include(te => te.Employee).ToListAsync();
             Assert.Equal(2, entries.Count);
-            Assert.DoesNotContain(entries, e => e.Employee!.EmplyeeId == "E001" && e.Date == new DateOnly(2025, 11, 12));
-            Assert.Contains(entries, e => e.Employee!.EmplyeeId == "E001" && e.Date == new DateOnly(2025, 11, 13));
-            Assert.Contains(entries, e => e.Employee!.EmplyeeId == "E002" && e.Date == new DateOnly(2025, 11, 12));
+            Assert.DoesNotContain(entries, e => e.Employee!.EmployeeId == "E001" && e.Date == new DateOnly(2025, 11, 12));
+            Assert.Contains(entries, e => e.Employee!.EmployeeId == "E001" && e.Date == new DateOnly(2025, 11, 13));
+            Assert.Contains(entries, e => e.Employee!.EmployeeId == "E002" && e.Date == new DateOnly(2025, 11, 12));
         }
     }
 
@@ -92,7 +92,7 @@ public class TimesheetImportDatabaseWriterTests(DatabaseFixture fixture)
         {
             new() 
             { 
-                Employee = new Employee { EmplyeeId = "E001", EmployeeName = "John Doe" },
+                Employee = new Employee { EmployeeId = "E001", EmployeeName = "John Doe" },
                 Project = new Project { ProjectCode = "PRJ001" },
                 Date = new DateOnly(2025, 11, 12),
                 StartTime = new TimeOnly(9, 0),
@@ -120,7 +120,7 @@ public class TimesheetImportDatabaseWriterTests(DatabaseFixture fixture)
             Assert.Equal(1, timeEntryCount);
 
             var employee = await context.Employees.FirstAsync();
-            Assert.Equal("E001", employee.EmplyeeId);
+            Assert.Equal("E001", employee.EmployeeId);
             Assert.Equal("John Doe", employee.EmployeeName);
 
             var project = await context.Projects.FirstAsync();
@@ -136,8 +136,8 @@ public class TimesheetImportDatabaseWriterTests(DatabaseFixture fixture)
         {
             context.Employees.RemoveRange(context.Employees);
             context.Employees.AddRange(
-                new Employee { EmplyeeId = "E001", EmployeeName = "John Doe" },
-                new Employee { EmplyeeId = "E002", EmployeeName = "Jane Smith" }
+                new Employee { EmployeeId = "E001", EmployeeName = "John Doe" },
+                new Employee { EmployeeId = "E002", EmployeeName = "Jane Smith" }
             );
             await context.SaveChangesAsync();
         }
@@ -152,8 +152,8 @@ public class TimesheetImportDatabaseWriterTests(DatabaseFixture fixture)
 
         // Assert
         Assert.Equal(2, employees.Count());
-        Assert.Contains(employees, e => e.EmplyeeId == "E001");
-        Assert.Contains(employees, e => e.EmplyeeId == "E002");
+        Assert.Contains(employees, e => e.EmployeeId == "E001");
+        Assert.Contains(employees, e => e.EmployeeId == "E002");
     }
 
     [Fact]
@@ -200,7 +200,7 @@ public class TimesheetImportDatabaseWriterTests(DatabaseFixture fixture)
         {
             new() 
             { 
-                Employee = new Employee { EmplyeeId = "E001", EmployeeName = "John Doe" },
+                Employee = new Employee { EmployeeId = "E001", EmployeeName = "John Doe" },
                 Project = new Project { ProjectCode = "PRJ001" },
                 Date = new DateOnly(2025, 11, 12),
                 StartTime = new TimeOnly(9, 0),
@@ -242,7 +242,7 @@ public class TimesheetImportDatabaseWriterTests(DatabaseFixture fixture)
         {
             new() 
             { 
-                Employee = new Employee { EmplyeeId = "E001", EmployeeName = "John Doe" },
+                Employee = new Employee { EmployeeId = "E001", EmployeeName = "John Doe" },
                 Project = new Project { ProjectCode = "PRJ001" },
                 Date = new DateOnly(2025, 11, 12),
                 StartTime = new TimeOnly(9, 0),

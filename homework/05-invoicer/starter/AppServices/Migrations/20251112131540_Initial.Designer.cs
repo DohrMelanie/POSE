@@ -31,7 +31,7 @@ namespace AppServices.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("EmplyeeId")
+                    b.Property<string>("EmployeeId")
                         .IsRequired()
                         .HasMaxLength(5)
                         .HasColumnType("TEXT");

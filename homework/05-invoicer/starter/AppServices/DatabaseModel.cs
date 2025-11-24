@@ -7,7 +7,7 @@ public class Employee
     public int Id { get; set; }
 
     [MaxLength(5)]
-    public string EmplyeeId { get; set; } = string.Empty;
+    public string EmployeeId { get; set; } = string.Empty;
 
     [MaxLength(100)]
     public string EmployeeName { get; set; } = string.Empty;

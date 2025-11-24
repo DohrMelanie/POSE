@@ -327,7 +327,7 @@ public class TimesheetParserTests
         var existingEmployee = new Employee
         {
             Id = 1,
-            EmplyeeId = "4711",
+            EmployeeId = "4711",
             EmployeeName = "Old Name"
         };
         var existingEmployees = new List<Employee> { existingEmployee };
