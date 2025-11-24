@@ -48,14 +48,16 @@ public class TimesheetImportDatabaseReaderWriter(ApplicationDataContext context)
 
     public async Task ClearDayAsync(string employeeId, DateOnly date)
     {
-        // TODO: Implement
-        throw new NotImplementedException();
+        await context.TimeEntries
+            .Where(te => te.Employee!.EmployeeId == employeeId && te.Date == date)
+            .ExecuteDeleteAsync();
+        await context.SaveChangesAsync();
     }
 
     public async Task WriteTimeEntriesAsync(IEnumerable<TimeEntry> entries)
     {
-        // TODO: Implement
-        throw new NotImplementedException();
+        context.TimeEntries.AddRangeAsync(entries);
+        await context.SaveChangesAsync();
     }
 
     public async Task<IEnumerable<Employee>> GetAllEmployeesAsync() => await context.Employees.ToListAsync();

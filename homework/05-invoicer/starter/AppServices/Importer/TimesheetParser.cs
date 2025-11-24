@@ -124,16 +124,28 @@ public class TimesheetParser : ITimesheetParser
         var empId = string.Empty;
         var empName = string.Empty;
         DateOnly? date = null;
+        var projectCache = new Dictionary<string, Project>(StringComparer.Ordinal);
+        foreach (var p in existingProjects)
+        {
+            if (p.ProjectCode is { } code)
+            {
+                projectCache.TryAdd(code, p);
+            }
+        }
 
-        if (!lines.Contains("TIMESHEETS"))
+        if (!lines.Any(line => line.Contains("TIMESHEETS")))
         {
             throw new TimesheetParseException(ImportFileError.MissingTimesheetSection);
         }
         
-        
-        // alle fehlermeldungen machen!
         foreach (var line in lines)
         {
+            if (!(line.StartsWith("TIMESHEETS: ") || line.StartsWith("EMP-ID: ") || line.StartsWith("EMP-NAME: ") ||
+                  line.Contains(';')) && line.Contains(':'))
+            {
+                throw new TimesheetParseException(ImportFileError.UnknownKey);
+            }
+            
             if (line.StartsWith("EMP-ID:"))
             {
                 CheckForFieldErrors(line);
@@ -205,6 +217,11 @@ public class TimesheetParser : ITimesheetParser
                     throw new TimesheetParseException(ImportFileError.EndTimeBeforeStartTime);
                 }
 
+                if (parts.Any(string.IsNullOrEmpty))
+                {
+                    throw new TimesheetParseException(ImportFileError.EmptyField);
+                }
+
                 if (!(parts[2].StartsWith('"') && parts[2].EndsWith('"')))
                 {
                     throw new TimesheetParseException(ImportFileError.DescriptionNotQuoted);
@@ -214,8 +231,8 @@ public class TimesheetParser : ITimesheetParser
                 {
                     throw new TimesheetParseException(ImportFileError.DescriptionTooLong);
                 }
-                
-                var projectCode = parts[3].Trim();
+
+                var projectCode = parts[3];
                 if (projectCode.StartsWith('"') || projectCode.EndsWith('"'))
                 {
                     throw new TimesheetParseException(ImportFileError.ProjectQuoted);
@@ -225,16 +242,20 @@ public class TimesheetParser : ITimesheetParser
                     throw new TimesheetParseException(ImportFileError.ProjectTooLong);
                 }
 
-                var emp = existingEmployees.FirstOrDefault(e => e.Id == int.Parse(empId));
+                var emp = existingEmployees.FirstOrDefault(e => e.EmployeeId == empId);
                 if (emp == null)
                 {
-                    emp = new Employee() { Id = int.Parse(empId), EmployeeName = empName };
+                    emp = new Employee() { EmployeeId = empId, EmployeeName = empName };
                 } else
                 {
                     emp.EmployeeName = empName;
                 }
                 
-                var project = existingProjects.FirstOrDefault(p => p.ProjectCode == projectCode) ?? new Project { ProjectCode = projectCode };
+                if (!projectCache.TryGetValue(projectCode, out var project))
+                {
+                    project = new Project { ProjectCode = projectCode };
+                    projectCache[projectCode] = project;
+                }
 
                 var entry = new TimeEntry()
                 {
@@ -290,19 +311,10 @@ public class TimesheetParser : ITimesheetParser
         {
             throw new TimesheetParseException(ImportFileError.EmptyField);
         }
-        if (fields[0].ToUpper() != "EMP-ID" && fields[0].ToUpper() != "TIMESHEETS" && fields[0].ToUpper() != "EMP-NAME")
-        {
-            throw new TimesheetParseException(ImportFileError.UnknownKey);
-        }
     }
 
     private static void CheckForEmpErrors(string empId, string empName)
     {
-        if (string.IsNullOrEmpty(empId) && string.IsNullOrEmpty(empName))
-        {
-            throw new TimesheetParseException(ImportFileError.TimesheetSectionBeforeEmployeeData);
-        }
-                
         if (string.IsNullOrEmpty(empId))
         {
             throw new TimesheetParseException(ImportFileError.MissingEmployeeId);
@@ -311,6 +323,10 @@ public class TimesheetParser : ITimesheetParser
         if (string.IsNullOrEmpty(empName))
         {
             throw new TimesheetParseException(ImportFileError.MissingEmployeeName);
+        }
+        if (string.IsNullOrEmpty(empId) && string.IsNullOrEmpty(empName)) // TODO
+        {
+            throw new TimesheetParseException(ImportFileError.TimesheetSectionBeforeEmployeeData);
         }
     }
 }
