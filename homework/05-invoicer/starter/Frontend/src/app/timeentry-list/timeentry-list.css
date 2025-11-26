@@ -1,0 +1,51 @@
+.timesheet-container {
+    margin: 2rem;
+}
+
+.filters {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+select, input {
+    padding: 0.4rem;
+    background-color: aliceblue;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+button {
+    padding: 0.5rem 1rem;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 1rem;
+}
+
+.timesheet-grid {
+    display: grid;
+  grid-template-columns: 120px 150px 120px 100px 100px 1fr 180px;
+    gap: 1rem;
+    width: 100%;
+    border-collapse: collapse;
+    overflow: hidden;
+}
+
+.grid-header {
+    background-color: #f4f4f4;
+    font-weight: bold;
+    padding: 0.75rem;
+}
+.grid-cell {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem;
+}

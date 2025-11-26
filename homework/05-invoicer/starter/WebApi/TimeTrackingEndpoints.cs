@@ -81,12 +81,12 @@ public static class TimeTrackingEndpoints
         
         app.MapDelete("/timeentries/{id:int}", async (int id, ApplicationDataContext db) =>
         {
-            var project = await db.Projects.FindAsync(id);
-            if (project == null)
+            var entry = await db.TimeEntries.FindAsync(id);
+            if (entry == null)
             {
                 return Results.NotFound();
             }
-            db.Projects.Remove(project);
+            db.TimeEntries.Remove(entry);
             await db.SaveChangesAsync();
             return Results.NoContent();
         }).Produces(StatusCodes.Status204NoContent);
