@@ -7,14 +7,14 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
-import { TimeEntry } from '../../models/time-entry';
+import { TimeEntryDto } from '../../models/time-entry-dto';
 
 export interface GetTimeEntries$Params {
   employeeId?: number;
   projectId?: number;
 }
 
-export function getTimeEntries(http: HttpClient, rootUrl: string, params?: GetTimeEntries$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<TimeEntry>>> {
+export function getTimeEntries(http: HttpClient, rootUrl: string, params?: GetTimeEntries$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<TimeEntryDto>>> {
   const rb = new RequestBuilder(rootUrl, getTimeEntries.PATH, 'get');
   if (params) {
     rb.query('employeeId', params.employeeId, {});
@@ -26,7 +26,7 @@ export function getTimeEntries(http: HttpClient, rootUrl: string, params?: GetTi
   ).pipe(
     filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
     map((r: HttpResponse<any>) => {
-      return r as StrictHttpResponse<Array<TimeEntry>>;
+      return r as StrictHttpResponse<Array<TimeEntryDto>>;
     })
   );
 }

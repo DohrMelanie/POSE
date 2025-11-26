@@ -5,7 +5,6 @@ export type { Employee } from './models/employee';
 export type { Employee2 } from './models/employee-2';
 export type { Project } from './models/project';
 export type { Project2 } from './models/project-2';
-export type { Project3 } from './models/project-3';
 export type { TimeEntry } from './models/time-entry';
-export type { TimeEntry2 } from './models/time-entry-2';
+export type { TimeEntryDto } from './models/time-entry-dto';
 export type { TimeEntryUpdateDto } from './models/time-entry-update-dto';

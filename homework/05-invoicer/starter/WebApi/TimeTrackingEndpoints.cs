@@ -24,9 +24,10 @@ public static class TimeTrackingEndpoints
                 .Include(te => te.Project)
                 .Where(te => employeeId == null || te.EmployeeId == employeeId)
                 .Where(te => projectId == null || te.ProjectId == projectId)
+                .Select(te => new TimeEntryDto(te.Id, te.Date, te.StartTime, te.EndTime, te.Description, te.EmployeeId, te.Employee!.EmployeeName, te.ProjectId, te.Project!.ProjectCode))
                 .ToListAsync();
             return entries;
-        }).Produces<List<TimeEntry>>()
+        }).Produces<List<TimeEntryDto>>()
         .Produces(StatusCodes.Status404NotFound) // when filters are not matched
         .WithName("GetTimeEntries")
         .WithDescription("Gets all or filtered timeentries");
@@ -57,8 +58,23 @@ public static class TimeTrackingEndpoints
                 .Include(te => te.Employee)
                 .Include(te => te.Project)
                 .FirstOrDefaultAsync(te => te.Id == id);
-            return entry == null ? Results.NotFound() : Results.Ok(entry);
-        }).Produces<TimeEntry>()
+            if (entry == null)
+            {
+                return Results.NotFound();
+            }
+            var entryDto = new TimeEntryDto(
+                entry.Id, 
+                entry.Date, 
+                entry.StartTime, 
+                entry.EndTime, 
+                entry.Description, 
+                entry.EmployeeId, 
+                entry.Employee!.EmployeeName, 
+                entry.ProjectId, 
+                entry.Project!.ProjectCode);
+            
+            return Results.Ok(entryDto);
+        }).Produces<TimeEntryDto>()
         .Produces(StatusCodes.Status404NotFound)
         .WithName("GetTimeEntry")
         .WithDescription("Gets time entry");
@@ -86,3 +102,13 @@ public record TimeEntryUpdateDto(
     int EmployeeId,
     int ProjectId);
 
+public record TimeEntryDto(
+    int Id,
+    DateOnly Date,
+    TimeOnly StartTime,
+    TimeOnly EndTime,
+    string Description,
+    int EmployeeId,
+    string EmployeeName,
+    int ProjectId,
+    string ProjectCode);
