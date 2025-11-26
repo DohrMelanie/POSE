@@ -19,21 +19,39 @@ public static class TimeTrackingEndpoints
 
         app.MapGet("/timeentries", async (ApplicationDataContext db, int? employeeId, int? projectId) =>
         {
-            // TODO
+            var entries = await db.TimeEntries
+                .Include(te => te.Employee)
+                .Include(te => te.Project)
+                .Where(te => employeeId == null || te.EmployeeId == employeeId)
+                .Where(te => projectId == null || te.ProjectId == projectId)
+                .ToListAsync();
+            return entries;
         }).Produces<List<TimeEntry>>()
         .Produces(StatusCodes.Status404NotFound) // when filters are not matched
         .WithName("GetTimeEntries")
         .WithDescription("Gets all or filtered timeentries");
 
-        app.MapPut("/timeentries/{id}", async (int id, TimeEntryUpdateDto dto, ApplicationDataContext db) =>
+        app.MapPut("/timeentries/{id:int}", async (int id, TimeEntryUpdateDto dto, ApplicationDataContext db) =>
         {
-            // TODO (also validate all fields)
+            var entry = await db.TimeEntries.FindAsync(id);
+            if (entry == null)
+            {
+                return Results.NotFound();
+            }
+            entry.Date = dto.Date;
+            entry.StartTime = dto.StartTime;
+            entry.EndTime = dto.EndTime;
+            entry.Description = dto.Description;
+            entry.EmployeeId = dto.EmployeeId;
+            entry.ProjectId = dto.ProjectId;
+            await db.SaveChangesAsync();
+            return Results.NoContent();
         }).Produces(StatusCodes.Status204NoContent)
         .Produces(StatusCodes.Status404NotFound)
         .WithName("UpdateTimeEntry")
         .WithDescription("Updates time entry");
 
-        app.MapGet("/timeentries/{id}", async (int id, ApplicationDataContext db) =>
+        app.MapGet("/timeentries/{id:int}", async (int id, ApplicationDataContext db) =>
         {
             var entry =  await db.TimeEntries
                 .Include(te => te.Employee)
