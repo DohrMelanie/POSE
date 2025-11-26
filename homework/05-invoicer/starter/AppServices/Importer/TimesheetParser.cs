@@ -137,6 +137,8 @@ public class TimesheetParser : ITimesheetParser
         {
             throw new TimesheetParseException(ImportFileError.MissingTimesheetSection);
         }
+
+        Employee? currentEmployee = null;
         
         foreach (var line in lines)
         {
@@ -242,14 +244,25 @@ public class TimesheetParser : ITimesheetParser
                     throw new TimesheetParseException(ImportFileError.ProjectTooLong);
                 }
 
-                var emp = existingEmployees.FirstOrDefault(e => e.EmployeeId == empId);
-                if (emp == null)
+                Employee? emp;
+                if (currentEmployee is null || currentEmployee.EmployeeId != empId)
                 {
-                    emp = new Employee() { EmployeeId = empId, EmployeeName = empName };
-                } else
-                {
-                    emp.EmployeeName = empName;
+                    emp = existingEmployees.FirstOrDefault(e => e.EmployeeId == empId);
+                    if (emp == null)
+                    {
+                        emp = new Employee() { EmployeeId = empId, EmployeeName = empName };
+                    } else
+                    {
+                        emp.EmployeeName = empName;
+                    }
+                    currentEmployee = emp;
                 }
+                else
+                {
+                    currentEmployee.EmployeeName = empName;
+                    emp = currentEmployee;
+                }
+
                 
                 if (!projectCache.TryGetValue(projectCode, out var project))
                 {

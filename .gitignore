@@ -6,3 +6,6 @@ homework/02-avalonia-efcore/cashregister.db-wal
 homework/03-cashregister/CashRegister.Data/database.db
 homework/03-cashregister/CashRegister.Data/database.db-shm
 homework/03-cashregister/CashRegister.Data/database.db-wal
+homework/05-invoicer/database.db
+homework/05-invoicer/database.db-shm
+homework/05-invoicer/database.db-wal
