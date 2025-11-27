@@ -86,6 +86,6 @@ export class TimeentryList {
   }
 
   protected editTimeEntry(id: number) {
-    this.router.navigate(['/entries/' + id]);
+    this.router.navigate(['/entries', id]);
   }
 }

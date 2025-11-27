@@ -119,7 +119,7 @@ public class TimesheetParser : ITimesheetParser
     /// <inheritdoc/>
     public IEnumerable<TimeEntry> ParseCsv(string csvContent, IEnumerable<Employee> existingEmployees, IEnumerable<Project> existingProjects)
     {
-        var lines = csvContent.Split("\n");
+        var lines = csvContent.Split(["\r\n", "\n"], StringSplitOptions.RemoveEmptyEntries);
         List<TimeEntry> entries = [];
         var empId = string.Empty;
         var empName = string.Empty;

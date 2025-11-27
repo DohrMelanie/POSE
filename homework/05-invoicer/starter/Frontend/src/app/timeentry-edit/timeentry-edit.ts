@@ -1,4 +1,4 @@
-import { Component, inject, input, OnInit, signal } from '@angular/core';
+import { Component, inject, input, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { Employee, Project, TimeEntryDto, TimeEntryUpdateDto } from '../api/models';
 import { getEmployees, getProjects, getTimeEntries, getTimeEntry, updateTimeEntry } from '../api/functions';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -12,6 +12,7 @@ import { FormsModule } from '@angular/forms';
   imports: [FormsModule],
   templateUrl: './timeentry-edit.html',
   styleUrl: './timeentry-edit.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TimeentryEdit implements OnInit{
   protected readonly employees = signal<Employee[]>([]);
@@ -31,7 +32,7 @@ export class TimeentryEdit implements OnInit{
   private apiConfiguration = inject(ApiConfiguration);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
-  public timeEntryId = input.required<number>()
+  public id = input.required<number>()
 
   async ngOnInit() {
     this.apiConfiguration.rootUrl = environment.apiBaseUrl;
@@ -40,10 +41,8 @@ export class TimeentryEdit implements OnInit{
 
   private async loadData() {
     try {
-      const ts = await this.api.invoke(getTimeEntry, { id: this.timeEntryId() });
-
       const [timeEntry, employees, projects] = await Promise.all([
-        this.api.invoke(getTimeEntry, { id: this.timeEntryId() }),
+        this.api.invoke(getTimeEntry, { id: this.id() }),
         this.api.invoke(getEmployees, {}),
         this.api.invoke(getProjects, {})
       ]);
@@ -70,7 +69,7 @@ export class TimeentryEdit implements OnInit{
   }
 
   protected async onSubmit() {
-    if (!this.timeEntryId() || !this.employeeId() || !this.projectId()) {
+    if (!this.id() || !this.employeeId() || !this.projectId()) {
       return;
     }
 
@@ -88,11 +87,11 @@ export class TimeentryEdit implements OnInit{
       };
 
       await this.api.invoke(updateTimeEntry, {
-        id: this.timeEntryId(),
+        id: this.id(),
         body: updateDto
       });
 
-      this.router.navigate(['/timesheet']);
+      this.router.navigate(['/entries']);
     } catch (err: any) {
       this.error.set(err.error || 'Failed to save time entry');
       console.error(err);
@@ -102,6 +101,6 @@ export class TimeentryEdit implements OnInit{
   }
 
   protected cancel() {
-    this.router.navigate(['/timeentries']);
+    this.router.navigate(['/entries']);
   }
 }
