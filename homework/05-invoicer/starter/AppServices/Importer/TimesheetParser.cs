@@ -138,6 +138,11 @@ public class TimesheetParser : ITimesheetParser
             throw new TimesheetParseException(ImportFileError.MissingTimesheetSection);
         }
 
+        if (csvContent.IndexOf("TIMESHEETS", StringComparison.Ordinal) < csvContent.IndexOf("EMP-ID:", StringComparison.Ordinal))
+        {
+            throw new TimesheetParseException(ImportFileError.TimesheetSectionBeforeEmployeeData);
+        }
+
         Employee? currentEmployee = null;
         
         foreach (var line in lines)
@@ -336,10 +341,6 @@ public class TimesheetParser : ITimesheetParser
         if (string.IsNullOrEmpty(empName))
         {
             throw new TimesheetParseException(ImportFileError.MissingEmployeeName);
-        }
-        if (string.IsNullOrEmpty(empId) && string.IsNullOrEmpty(empName)) // TODO
-        {
-            throw new TimesheetParseException(ImportFileError.TimesheetSectionBeforeEmployeeData);
         }
     }
 }
