@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace AppServices.Importer;
 
 /// <summary>
@@ -249,26 +251,8 @@ public class TimesheetParser : ITimesheetParser
                     throw new TimesheetParseException(ImportFileError.ProjectTooLong);
                 }
 
-                Employee? emp;
-                if (currentEmployee is null || currentEmployee.EmployeeId != empId)
-                {
-                    emp = existingEmployees.FirstOrDefault(e => e.EmployeeId == empId);
-                    if (emp == null)
-                    {
-                        emp = new Employee() { EmployeeId = empId, EmployeeName = empName };
-                    } else
-                    {
-                        emp.EmployeeName = empName;
-                    }
-                    currentEmployee = emp;
-                }
-                else
-                {
-                    currentEmployee.EmployeeName = empName;
-                    emp = currentEmployee;
-                }
+                var emp = GetEmployee(existingEmployees, empId, empName, ref currentEmployee);
 
-                
                 if (!projectCache.TryGetValue(projectCode, out var project))
                 {
                     project = new Project { ProjectCode = projectCode };
@@ -288,6 +272,31 @@ public class TimesheetParser : ITimesheetParser
             }
         }
         return entries.Count == 0 ? throw new TimesheetParseException(ImportFileError.EmptyTimesheetSection) : entries;
+    }
+
+    private static Employee GetEmployee(IEnumerable<Employee> existingEmployees, string empId, string empName,
+        [AllowNull] ref Employee currentEmployee)
+    {
+        Employee? emp;
+        if (currentEmployee is null || currentEmployee.EmployeeId != empId)
+        {
+            emp = existingEmployees.FirstOrDefault(e => e.EmployeeId == empId);
+            if (emp == null)
+            {
+                emp = new Employee() { EmployeeId = empId, EmployeeName = empName };
+            } else
+            {
+                emp.EmployeeName = empName;
+            }
+            currentEmployee = emp;
+        }
+        else
+        {
+            currentEmployee.EmployeeName = empName;
+            emp = currentEmployee;
+        }
+
+        return emp;
     }
 
     private static TimeOnly GetTime(string time)

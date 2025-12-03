@@ -1,6 +1,12 @@
 import { Component, inject, input, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { Employee, Project, TimeEntryDto, TimeEntryUpdateDto } from '../api/models';
-import { getEmployees, getProjects, getTimeEntries, getTimeEntry, updateTimeEntry } from '../api/functions';
+import {
+  getEmployees,
+  getProjects,
+  getTimeEntries,
+  getTimeEntry,
+  updateTimeEntry,
+} from '../api/functions';
 import { Router, ActivatedRoute } from '@angular/router';
 import { environment } from '../../environments/environment.development';
 import { Api } from '../api/api';
@@ -14,7 +20,7 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './timeentry-edit.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TimeentryEdit implements OnInit{
+export class TimeentryEdit implements OnInit {
   protected readonly employees = signal<Employee[]>([]);
   protected readonly projects = signal<Project[]>([]);
   protected readonly loading = signal<boolean>(true);
@@ -32,7 +38,7 @@ export class TimeentryEdit implements OnInit{
   private apiConfiguration = inject(ApiConfiguration);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
-  public id = input.required<number>()
+  public id = input.required<number>();
 
   async ngOnInit() {
     this.apiConfiguration.rootUrl = environment.apiBaseUrl;
@@ -44,11 +50,11 @@ export class TimeentryEdit implements OnInit{
       const [timeEntry, employees, projects] = await Promise.all([
         this.api.invoke(getTimeEntry, { id: this.id() }),
         this.api.invoke(getEmployees, {}),
-        this.api.invoke(getProjects, {})
+        this.api.invoke(getProjects, {}),
       ]);
 
-      this.employees.set(employees.filter(e => e !== null) as Employee[]);
-      this.projects.set(projects.filter(p => p !== null) as Project[]);
+      this.employees.set(employees.filter((e) => e !== null) as Employee[]);
+      this.projects.set(projects.filter((p) => p !== null) as Project[]);
 
       if (timeEntry) {
         this.date.set(timeEntry.date || '');
@@ -83,12 +89,12 @@ export class TimeentryEdit implements OnInit{
         endTime: this.endTime(),
         description: this.description(),
         employeeId: this.employeeId()!,
-        projectId: this.projectId()!
+        projectId: this.projectId()!,
       };
 
       await this.api.invoke(updateTimeEntry, {
         id: this.id(),
-        body: updateDto
+        body: updateDto,
       });
 
       this.router.navigate(['/entries']);
