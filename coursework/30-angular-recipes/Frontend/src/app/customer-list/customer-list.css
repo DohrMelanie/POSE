@@ -116,8 +116,8 @@ h1 {
   background-color: var(--color-interactive-hover);
 }
 
-.delete-btn {
-  background-color: var(--color-danger);
+.btn {
+  background-color: var(--color-interactive);
   color: white;
   border: none;
   padding: 0.5rem 1rem;
@@ -125,6 +125,10 @@ h1 {
   cursor: pointer;
   font-size: 0.9rem;
   transition: background-color 0.2s;
+}
+
+.delete-btn {
+  background-color: var(--color-danger);
 }
 
 .delete-btn:hover {

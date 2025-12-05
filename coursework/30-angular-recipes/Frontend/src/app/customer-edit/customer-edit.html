@@ -1,19 +1,16 @@
-<div class="customer-edit-container">
-  <h1>Edit Customer</h1>
+<dialog #dialog>
+  <div class="customer-edit-container">
+    <h1>Edit Customer</h1>
 
-  @if (loading()) {
+    @if (loading()) {
     <div class="loading">
       <p>Loading customer data...</p>
     </div>
-  }
-
-  @if (error()) {
+    } @if (error()) {
     <div class="error">
       <p>{{ error() }}</p>
     </div>
-  }
-
-  @if (!loading() && !error()) {
+    } @if (!loading() && !error()) {
     <form (submit)="onSubmit($event)">
       <div class="form-grid">
         <div class="form-field">
@@ -25,11 +22,11 @@
             [class.invalid]="customerForm.name().touched() && customerForm.name().invalid()"
           />
           @if (customerForm.name().touched() && customerForm.name().invalid()) {
-            <div class="error-messages">
-              @for (error of customerForm.name().errors(); track error) {
-                <span class="error-message">{{ error.message }}</span>
-              }
-            </div>
+          <div class="error-messages">
+            @for (error of customerForm.name().errors(); track error) {
+            <span class="error-message">{{ error.message }}</span>
+            }
+          </div>
           }
         </div>
 
@@ -39,14 +36,16 @@
             type="date"
             id="dateOfBirth"
             [field]="customerForm.dateOfBirth"
-            [class.invalid]="customerForm.dateOfBirth().touched() && customerForm.dateOfBirth().invalid()"
+            [class.invalid]="
+              customerForm.dateOfBirth().touched() && customerForm.dateOfBirth().invalid()
+            "
           />
           @if (customerForm.dateOfBirth().touched() && customerForm.dateOfBirth().invalid()) {
-            <div class="error-messages">
-              @for (error of customerForm.dateOfBirth().errors(); track error) {
-                <span class="error-message">{{ error.message }}</span>
-              }
-            </div>
+          <div class="error-messages">
+            @for (error of customerForm.dateOfBirth().errors(); track error) {
+            <span class="error-message">{{ error.message }}</span>
+            }
+          </div>
           }
         </div>
 
@@ -60,11 +59,11 @@
             [class.invalid]="customerForm.revenue().touched() && customerForm.revenue().invalid()"
           />
           @if (customerForm.revenue().touched() && customerForm.revenue().invalid()) {
-            <div class="error-messages">
-              @for (error of customerForm.revenue().errors(); track error) {
-                <span class="error-message">{{ error.message }}</span>
-              }
-            </div>
+          <div class="error-messages">
+            @for (error of customerForm.revenue().errors(); track error) {
+            <span class="error-message">{{ error.message }}</span>
+            }
+          </div>
           }
         </div>
 
@@ -75,23 +74,22 @@
             id="customerValue"
             step="1"
             [field]="customerForm.customerValue"
-            [class.invalid]="customerForm.customerValue().touched() && customerForm.customerValue().invalid()"
+            [class.invalid]="
+              customerForm.customerValue().touched() && customerForm.customerValue().invalid()
+            "
           />
           @if (customerForm.customerValue().touched() && customerForm.customerValue().invalid()) {
-            <div class="error-messages">
-              @for (error of customerForm.customerValue().errors(); track error) {
-                <span class="error-message">{{ error.message }}</span>
-              }
-            </div>
+          <div class="error-messages">
+            @for (error of customerForm.customerValue().errors(); track error) {
+            <span class="error-message">{{ error.message }}</span>
+            }
+          </div>
           }
         </div>
 
         <div class="form-field checkbox-field">
           <label>
-            <input
-              type="checkbox"
-              [field]="customerForm.isActive"
-            />
+            <input type="checkbox" [field]="customerForm.isActive" />
             Active
           </label>
         </div>
@@ -106,6 +104,6 @@
         </button>
       </div>
     </form>
-  }
-</div>
-
+    }
+  </div>
+</dialog>

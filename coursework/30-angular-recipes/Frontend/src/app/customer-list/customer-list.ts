@@ -1,20 +1,22 @@
-import { Component, inject, signal, computed, OnInit } from '@angular/core';
+import { Component, inject, signal, computed, OnInit, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { DatePipe, CurrencyPipe } from '@angular/common';
-import { RouterLink } from '@angular/router';
+
 import { firstValueFrom } from 'rxjs';
 import { Customer } from '../api/models/customer';
+import { CustomerEdit } from '../customer-edit/customer-edit';
 import { customersGet, customersIdDelete } from '../api/functions';
 import { ApiConfiguration } from '../api/api-configuration';
 
 // TODO: If unfamiliar, research about Angular standalone components (no NgModule needed)
 @Component({
   selector: 'app-customer-list',
-  imports: [DatePipe, RouterLink, CurrencyPipe],
+  imports: [DatePipe, CurrencyPipe, CustomerEdit],
   templateUrl: './customer-list.html',
   styleUrl: './customer-list.css',
 })
 export class CustomerList implements OnInit {
+  @ViewChild(CustomerEdit) customerEdit!: CustomerEdit;
   // TODO: If unfamiliar, research about Angular inject (dependency injection)
   private readonly http = inject(HttpClient);
   private readonly apiConfig = inject(ApiConfiguration);
@@ -24,7 +26,8 @@ export class CustomerList implements OnInit {
   protected readonly loading = signal(true);
   protected readonly error = signal<string | null>(null);
   protected readonly selectedCustomerIds = signal<number[]>([]);
-  
+  protected readonly editingCustomerId = signal<number | undefined>(undefined);
+
   // TODO: If unfamiliar, research about Angular computed signals
   protected readonly selectedCount = computed(() => this.selectedCustomerIds().length);
   protected readonly hasSelection = computed(() => this.selectedCount() > 0);
@@ -80,6 +83,19 @@ export class CustomerList implements OnInit {
     });
   }
 
+  protected showEditDialog(id: number): void {
+    this.editingCustomerId.set(id);
+    this.customerEdit.open();
+  }
+
+  protected onCustomerSaved(): void {
+    this.loadCustomers();
+  }
+
+  protected onCustomerCancelled(): void {
+    // Dialog closes itself, nothing else to do
+  }
+
   protected isCustomerSelected(id: number): boolean {
     return this.selectedCustomerIds().includes(id);
   }
@@ -102,16 +118,16 @@ export class CustomerList implements OnInit {
     try {
       // Delete all selected customers
       await Promise.all(
-        selectedIds.map(id => 
+        selectedIds.map(id =>
           firstValueFrom(customersIdDelete(this.http, this.apiConfig.rootUrl, { id }))
         )
       );
-      
+
       // Remove deleted customers from list
-      this.customers.update(currentCustomers => 
+      this.customers.update(currentCustomers =>
         currentCustomers.filter(c => !selectedIds.includes(c.id!))
       );
-      
+
       // Clear selection
       this.selectedCustomerIds.update(() => []);
     } catch (err: any) {

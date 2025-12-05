@@ -1,6 +1,5 @@
-import { Component, inject, signal, OnInit, input } from '@angular/core';
+import { Component, inject, signal, input, output, ViewChild, ElementRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { form, Field, required, min, max, maxLength } from '@angular/forms/signals';
 import { CustomerPatchDto } from '../api/models/customer-patch-dto';
@@ -21,13 +20,18 @@ interface CustomerFormModel {
   templateUrl: './customer-edit.html',
   styleUrl: './customer-edit.css',
 })
-export class CustomerEdit implements OnInit {
+export class CustomerEdit {
   private readonly http = inject(HttpClient);
   private readonly apiConfig = inject(ApiConfiguration);
-  private readonly router = inject(Router);
 
-  // TODO: If unfamiliar, research about Angular input (to pass data from the route to the component)
-  id = input.required<number>();
+  @ViewChild('dialog') dialog!: ElementRef<HTMLDialogElement>;
+
+  // Input for the customer ID
+  id = input<number>();
+
+  // Outputs for dialog control
+  saved = output<void>();
+  cancelled = output<void>();
 
   protected readonly loading = signal(true);
   protected readonly error = signal<string | null>(null);
@@ -51,14 +55,21 @@ export class CustomerEdit implements OnInit {
     required(schemaPath.customerValue, { message: 'Customer value is required' });
 
     maxLength(schemaPath.name, 50, { message: 'Name must be at most 50 characters' });
-    
+
     min(schemaPath.revenue, 0, { message: 'Revenue must be at least 0' });
     min(schemaPath.customerValue, 0, { message: 'Customer value must be at least 0' });
     max(schemaPath.customerValue, 10, { message: 'Customer value must be at most 10' });
   });
 
-  ngOnInit(): void {
-    this.loadCustomer();
+  open() {
+    this.dialog.nativeElement.showModal();
+    if (this.id()) {
+      this.loadCustomer();
+    }
+  }
+
+  close() {
+    this.dialog.nativeElement.close();
   }
 
   private async loadCustomer() {
@@ -67,7 +78,7 @@ export class CustomerEdit implements OnInit {
 
     try {
       const response = await firstValueFrom(
-        customersIdGet(this.http, this.apiConfig.rootUrl, { id: this.id() })
+        customersIdGet(this.http, this.apiConfig.rootUrl, { id: this.id()! })
       );
       const customer = response.body;
 
@@ -88,12 +99,14 @@ export class CustomerEdit implements OnInit {
 
   protected async onSubmit(event: Event) {
     event.preventDefault();
-    
+
     // Check if all fields are valid
-    if (this.customerForm.name().invalid() || 
-        this.customerForm.dateOfBirth().invalid() ||
-        this.customerForm.revenue().invalid() ||
-        this.customerForm.customerValue().invalid()) {
+    if (
+      this.customerForm.name().invalid() ||
+      this.customerForm.dateOfBirth().invalid() ||
+      this.customerForm.revenue().invalid() ||
+      this.customerForm.customerValue().invalid()
+    ) {
       this.error.set('Please correct the errors in the form.');
       return;
     }
@@ -113,13 +126,13 @@ export class CustomerEdit implements OnInit {
 
       await firstValueFrom(
         customersIdPatch(this.http, this.apiConfig.rootUrl, {
-          id: this.id(),
+          id: this.id()!,
           body: patchDto,
         })
       );
 
-      // TODO: If unfamiliar, research about Angular router (to navigate to the customer list page)
-      this.router.navigate(['/customers']);
+      this.saved.emit();
+      this.close();
     } catch (error: any) {
       this.error.set('Error saving: ' + (error.message || JSON.stringify(error)));
     } finally {
@@ -134,7 +147,7 @@ export class CustomerEdit implements OnInit {
       }
     }
 
-    this.router.navigate(['/customers']);
+    this.cancelled.emit();
+    this.close();
   }
 }
-
