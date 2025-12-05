@@ -1,4 +1,4 @@
-import { Component, inject, signal, input, output, ViewChild, ElementRef } from '@angular/core';
+import { Component, inject, signal, output, ViewChild, ElementRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { form, Field, required, min, max, maxLength } from '@angular/forms/signals';
@@ -26,8 +26,8 @@ export class CustomerEdit {
 
   @ViewChild('dialog') dialog!: ElementRef<HTMLDialogElement>;
 
-  // Input for the customer ID
-  id = input<number>();
+  // Internal signal for the customer ID
+  protected readonly customerId = signal<number | undefined>(undefined);
 
   // Outputs for dialog control
   saved = output<void>();
@@ -37,7 +37,7 @@ export class CustomerEdit {
   protected readonly error = signal<string | null>(null);
   protected readonly saving = signal(false);
 
-  // TODO: If unfamiliar, research about signals in Angular forms (brand new in Angular 21)
+  // Form with validation
   protected readonly customerModel = signal<CustomerFormModel>({
     name: '',
     dateOfBirth: '',
@@ -46,8 +46,6 @@ export class CustomerEdit {
     isActive: true,
   });
 
-  // TODO: If unfamiliar, research about form validation with signals (required, min, max, maxLength)
-  // Form with validation
   protected readonly customerForm = form(this.customerModel, (schemaPath) => {
     required(schemaPath.name, { message: 'Name is required' });
     required(schemaPath.dateOfBirth, { message: 'Date of birth is required' });
@@ -61,11 +59,10 @@ export class CustomerEdit {
     max(schemaPath.customerValue, 10, { message: 'Customer value must be at most 10' });
   });
 
-  open() {
+  open(id: number) {
+    this.customerId.set(id);
     this.dialog.nativeElement.showModal();
-    if (this.id()) {
-      this.loadCustomer();
-    }
+    this.loadCustomer();
   }
 
   close() {
@@ -73,13 +70,19 @@ export class CustomerEdit {
   }
 
   private async loadCustomer() {
+    console.log('Loading customer...');
     this.loading.set(true);
     this.error.set(null);
 
     try {
+      const id = this.customerId();
+      console.log(id);
+      if (!id) throw new Error('No customer ID provided');
+
       const response = await firstValueFrom(
-        customersIdGet(this.http, this.apiConfig.rootUrl, { id: this.id()! })
+        customersIdGet(this.http, this.apiConfig.rootUrl, { id })
       );
+      console.log(response);
       const customer = response.body;
 
       // Fill form with customer data
@@ -91,6 +94,7 @@ export class CustomerEdit {
         isActive: customer.isActive,
       });
     } catch (error) {
+      console.log(error);
       this.error.set('Error loading customer: ' + JSON.stringify(error));
     } finally {
       this.loading.set(false);
@@ -115,6 +119,9 @@ export class CustomerEdit {
     this.error.set(null);
 
     try {
+      const id = this.customerId();
+      if (!id) throw new Error('No customer ID provided');
+
       const formData = this.customerModel();
       const patchDto: CustomerPatchDto = {
         name: formData.name,
@@ -126,7 +133,7 @@ export class CustomerEdit {
 
       await firstValueFrom(
         customersIdPatch(this.http, this.apiConfig.rootUrl, {
-          id: this.id()!,
+          id,
           body: patchDto,
         })
       );
