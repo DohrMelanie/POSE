@@ -4,6 +4,385 @@
     "title": "WebApi | v1",
     "version": "1.0.0"
   },
-  "paths": { },
-  "components": { }
+  "paths": {
+    "/verify-pin/{name}": {
+      "post": {
+        "tags": [
+          "WebApi"
+        ],
+        "description": "Check if the pin is from a child or a parent",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthReq"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/wishlist/{name}/items": {
+      "post": {
+        "tags": [
+          "WebApi"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthReq"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/wishlist/{name}/items/{itemId}/mark-as-bought": {
+      "post": {
+        "tags": [
+          "WebApi"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "itemId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthReq"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/wishlist/{name}/items/{itemId}": {
+      "delete": {
+        "tags": [
+          "WebApi"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "itemId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthReq"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/wishlist/{name}/items/add": {
+      "post": {
+        "tags": [
+          "WebApi"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddItemReq"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskOfIResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/gift-categories": {
+      "get": {
+        "tags": [
+          "WebApi"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AddItemReq": {
+        "required": [
+          "itemName",
+          "category",
+          "pin"
+        ],
+        "type": "object",
+        "properties": {
+          "itemName": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string"
+          },
+          "pin": {
+            "type": "string"
+          }
+        }
+      },
+      "AggregateException": {
+        "type": "object",
+        "properties": {
+          "innerExceptions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Exception"
+            },
+            "nullable": true
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "targetSite": {
+            "$ref": "#/components/schemas/MethodBase"
+          },
+          "data": {
+            "type": "object",
+            "nullable": true
+          },
+          "innerException": {
+            "$ref": "#/components/schemas/Exception"
+          },
+          "helpLink": {
+            "type": "string",
+            "nullable": true
+          },
+          "source": {
+            "type": "string",
+            "nullable": true
+          },
+          "hResult": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "stackTrace": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "nullable": true
+      },
+      "AuthReq": {
+        "required": [
+          "wishListName",
+          "pin"
+        ],
+        "type": "object",
+        "properties": {
+          "wishListName": {
+            "type": "string"
+          },
+          "pin": {
+            "type": "string"
+          }
+        }
+      },
+      "Exception": {
+        "type": "object",
+        "properties": {
+          "targetSite": {
+            "$ref": "#/components/schemas/MethodBase"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "data": {
+            "type": "object",
+            "nullable": true
+          },
+          "innerException": {
+            "$ref": "#/components/schemas/Exception"
+          },
+          "helpLink": {
+            "type": "string",
+            "nullable": true
+          },
+          "source": {
+            "type": "string",
+            "nullable": true
+          },
+          "hResult": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "stackTrace": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "IResult": {
+        "type": "object",
+        "nullable": true
+      },
+      "MethodBase": {
+        "nullable": true
+      },
+      "TaskCreationOptions": {
+        "type": "integer"
+      },
+      "TaskOfIResult": {
+        "type": "object",
+        "properties": {
+          "result": {
+            "$ref": "#/components/schemas/IResult"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "exception": {
+            "$ref": "#/components/schemas/AggregateException"
+          },
+          "status": {
+            "$ref": "#/components/schemas/TaskStatus"
+          },
+          "isCanceled": {
+            "type": "boolean"
+          },
+          "isCompleted": {
+            "type": "boolean"
+          },
+          "isCompletedSuccessfully": {
+            "type": "boolean"
+          },
+          "creationOptions": {
+            "$ref": "#/components/schemas/TaskCreationOptions"
+          },
+          "asyncState": { },
+          "isFaulted": {
+            "type": "boolean"
+          }
+        }
+      },
+      "TaskStatus": {
+        "type": "integer"
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "WebApi"
+    }
+  ]
 }

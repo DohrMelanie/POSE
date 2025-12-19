@@ -1,4 +1,5 @@
 using AppServices;
+using WebApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +13,7 @@ var app = builder.Build();
 
 app.UseCors();
 app.MapOpenApi();
+app.MapWishListEndpoints();
 app.UseSwaggerUI(options => options.SwaggerEndpoint("/openapi/v1.json", "v1"));
 app.UseHttpsRedirection();
 
