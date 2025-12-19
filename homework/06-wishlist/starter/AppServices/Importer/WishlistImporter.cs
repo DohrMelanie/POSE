@@ -17,12 +17,69 @@ public interface IWishlistImporter
 /// <summary>
 /// Implementation for importing wishlists from JSON files
 /// </summary>
-public class WishlistImporter(IFileReader fileReader, IWishlistJsonParser jsonParser, IWishlistImportDatabaseWriter databaseWriter) : IWishlistImporter
+public class WishlistImporter(
+    IFileReader fileReader,
+    IWishlistJsonParser jsonParser,
+    IWishlistImportDatabaseWriter databaseWriter) : IWishlistImporter
 {
     public async Task<int> ImportFromJsonAsync(string jsonFolderPath, bool isDryRun = false)
     {
-        // TODO: Implement import logic
+        var listCount = 0;
+        await databaseWriter.BeginTransactionAsync();
+        try
+        {
+            var categoryCache = new Dictionary<string, GiftCategory>();
+            var files = fileReader.GetAllJsonFiles(jsonFolderPath);
 
-        throw new NotImplementedException();
+            foreach (var file in files)
+            {
+                var fileContent = await fileReader.ReadAllTextAsync(file);
+                var parsed = jsonParser.ParseJson(file, fileContent);
+            
+                if (await databaseWriter.WishlistExistsAsync(parsed.Wishlist.Name))
+                {
+                    continue;
+                }
+
+                var items = await Task.WhenAll(parsed.Items.Select(async i => new WishlistItem
+                    { Bought = i.Bought, ItemName = i.ItemName, Category = await GetCategory(i.Category, categoryCache) }));
+
+                await databaseWriter.WriteWishlistAsync(new Wishlist
+                {
+                    Name = parsed.Wishlist.Name, ParentPin = parsed.Wishlist.ParentPin, ChildPin = parsed.Wishlist.ChildPin, Items = items.ToList()
+                });
+                listCount++;
+            }
+            
+            if (isDryRun)
+            {
+                await databaseWriter.RollbackTransactionAsync();
+            }
+            else
+            {
+                await databaseWriter.CommitTransactionAsync();
+            }
+
+            return listCount;
+        }
+        catch
+        {
+            await databaseWriter.RollbackTransactionAsync();
+            throw;
+        }
+    }
+
+    private async Task<GiftCategory> GetCategory(string categoryName, Dictionary<string, GiftCategory> categoryCache)
+    {
+        if (categoryCache.TryGetValue(categoryName, out var category1))
+        {
+            return category1;
+        }
+        else
+        {
+            var category = await databaseWriter.GetOrCreateCategoryAsync(categoryName);
+            categoryCache[categoryName] = category;
+            return category;
+        }
     }
 }
