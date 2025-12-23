@@ -8,13 +8,14 @@ import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
 import { AuthReq } from '../../models/auth-req';
+import { VerifyPinResp } from '../../models/verify-pin-resp';
 
 export interface VerifyPinNamePost$Params {
   name: string;
       body: AuthReq
 }
 
-export function verifyPinNamePost(http: HttpClient, rootUrl: string, params: VerifyPinNamePost$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
+export function verifyPinNamePost(http: HttpClient, rootUrl: string, params: VerifyPinNamePost$Params, context?: HttpContext): Observable<StrictHttpResponse<VerifyPinResp>> {
   const rb = new RequestBuilder(rootUrl, verifyPinNamePost.PATH, 'post');
   if (params) {
     rb.path('name', params.name, {});
@@ -22,11 +23,11 @@ export function verifyPinNamePost(http: HttpClient, rootUrl: string, params: Ver
   }
 
   return http.request(
-    rb.build({ responseType: 'text', accept: '*/*', context })
+    rb.build({ responseType: 'json', accept: 'application/json', context })
   ).pipe(
     filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
     map((r: HttpResponse<any>) => {
-      return (r as HttpResponse<any>).clone({ body: undefined }) as StrictHttpResponse<void>;
+      return r as StrictHttpResponse<VerifyPinResp>;
     })
   );
 }

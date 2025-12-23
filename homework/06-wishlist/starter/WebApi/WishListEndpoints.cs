@@ -1,6 +1,4 @@
-using System.Net.Mime;
 using AppServices;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,7 +12,8 @@ public static class WishListEndpoints
                 async (ApplicationDataContext db, string name, [FromBody] AuthReq authReq) =>
                 await HandleVerifyPin(db, name, authReq))
             .WithDescription("Check if the pin is from a child or a parent")
-            .Produces(StatusCodes.Status200OK)
+            .Produces<VerifyPinResp>(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status401Unauthorized)
             .Produces(StatusCodes.Status404NotFound);
 
         app.MapPost("/wishlist/{name}/items",
@@ -40,9 +39,9 @@ public static class WishListEndpoints
         return app;
     }
 
-    private static async Task<IResult> HandleVerifyPin(ApplicationDataContext db, string pin, AuthReq authReq)
+    private static async Task<IResult> HandleVerifyPin(ApplicationDataContext db, string name, AuthReq authReq)
     {
-        var wishlist = await db.Wishlists.FirstOrDefaultAsync(w => w.ParentPin == pin || w.ChildPin == pin);
+        var wishlist = await db.Wishlists.FirstOrDefaultAsync(w => w.Name.ToLower() == name.ToLower());
 
         if (wishlist == null)
         {
@@ -154,7 +153,7 @@ public static class WishListEndpoints
     );
 
     public record VerifyPinResp(
-        string role
+        string Role
     );
 
     public record AddItemReq(
