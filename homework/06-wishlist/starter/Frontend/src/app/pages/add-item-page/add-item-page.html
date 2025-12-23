@@ -1,31 +1,38 @@
 <section class="card add">
   <h1>Add Your Wish for Christmas 🎄</h1>
-        <p>HERE</p>
-
   <p class="hint">Tell Santa what you want for Christmas.</p>
 
-  <form>
+  <form (submit)="onSubmit($event)">
     <div class="form-grid">
       <div class="field">
         <label for="itemName">Item</label>
         <!-- Add "invalid" class if the field is touched and invalid -->
-        <input id="itemName" type="text" />
+        <input id="itemName" [class.invalid]="error() && itemForm().touched()" [field]="itemForm.itemName" type="text" />
+        @if(itemForm().touched() && itemForm().invalid()) {
         <!-- Conditionally show validation errors -->
         <div class="error">
-          <!-- Add validation error messages here -->
+          @for (error of itemForm.itemName().errors(); track error) {
+          <span class="error-message">{{ error.message }}</span>
+          }
         </div>
+        }
       </div>
       <div class="field">
         <label for="category">Category</label>
         <!-- Add "invalid" class if the field is touched and invalid -->
-        <select id="category">
+        <select id="category" [class.invalid]="error() && itemForm().touched()" [field]="itemForm.category">
           <option value="">Select</option>
-          <!-- Loop through categories and create an option for each -->
+          @for(category of categories(); track category) {
+            <option value="{{ category }}">{{ category }}</option>
+          }
         </select>
-        <!-- Conditionally show validation errors -->
-        <div class="error">
-          <!-- Add validation error messages here -->
+        @if (itemForm.category().touched() && itemForm.category().invalid()) {
+        <div class="error-messages">
+          @for (error of itemForm.category().errors(); track error) {
+          <span class="error-message">{{ error.message }}</span>
+          }
         </div>
+        }
       </div>
     </div>
 
@@ -33,13 +40,14 @@
       <!-- 
         Disable the button if the form is invalid or currently saving."
       -->
-      <button class="btn primary" type="button">
-        Add item
-      </button>
+      <button class="btn primary" type="submit" [disabled]="itemForm().invalid() || saving()">Add item</button>
     </div>
   </form>
 
   <!-- Show error or success messages -->
-  <div class="message error">An error occurred.</div>
+   @if(error()) {
+      <div class="message error">An error occurred.</div>
+   } @else if(saving() == false && sentSuccessfully()) {
   <div class="message success">Santa has received your wish!</div>
+   }
 </section>

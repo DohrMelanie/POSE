@@ -19,24 +19,32 @@ public static class WishListEndpoints
         app.MapPost("/wishlist/{name}/items",
                 async (ApplicationDataContext db, string name, [FromBody] AuthReq authReq) =>
                 await HandleRetrieveWishlistItems(db, name, authReq))
+            .Produces(StatusCodes.Status401Unauthorized)
             .Produces<WishlistItemResp[]>(StatusCodes.Status200OK);
 
         app.MapPost("/wishlist/{name}/items/{itemId:int}/mark-as-bought",
             async (ApplicationDataContext db, string name, int itemId, [FromBody] AuthReq authReq) =>
             await HandleMarkAsBought(db, name, itemId, authReq))
+            .Produces(StatusCodes.Status401Unauthorized)
             .Produces(StatusCodes.Status200OK);
 
         app.MapDelete("/wishlist/{name}/items/{itemId:int}",
             async (ApplicationDataContext db, string name, int itemId, [FromBody] AuthReq authReq) =>
             await HandleDeleteItem(db, name, itemId, authReq))
+            .Produces(StatusCodes.Status401Unauthorized)
             .Produces(StatusCodes.Status204NoContent);
 
         app.MapPost("/wishlist/{name}/items/add",
             async (ApplicationDataContext db, string name, [FromBody] AddItemReq addItemReq) =>
-            HandleAddItem(db, name, addItemReq));
+            HandleAddItem(db, name, addItemReq))
+            .Accepts<AddItemReq>("application/json")
+            .Produces(StatusCodes.Status401Unauthorized)
+            .Produces(StatusCodes.Status404NotFound)
+            .Produces(StatusCodes.Status200OK);
 
         app.MapGet("/gift-categories",
-            async (ApplicationDataContext db) => db.GiftCategories.Select(c => c.Name).ToList());
+            async (ApplicationDataContext db) => db.GiftCategories.Select(c => c.Name).ToList())
+            .Produces<string[]>(StatusCodes.Status200OK);
 
         return app;
     }
@@ -144,6 +152,7 @@ public static class WishListEndpoints
 
         await db.WishlistItems.AddAsync(new WishlistItem
         {
+            WishlistId = wishlist.Id,
             Bought = false,
             ItemName = addItemReq.ItemName,
             Category = await db.GiftCategories.FirstOrDefaultAsync(c => c.Name == addItemReq.Category) ??

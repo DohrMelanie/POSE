@@ -8,14 +8,13 @@ import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
 import { AddItemReq } from '../../models/add-item-req';
-import { TaskOfIResult } from '../../models/task-of-i-result';
 
 export interface WishlistNameItemsAddPost$Params {
   name: string;
       body: AddItemReq
 }
 
-export function wishlistNameItemsAddPost(http: HttpClient, rootUrl: string, params: WishlistNameItemsAddPost$Params, context?: HttpContext): Observable<StrictHttpResponse<TaskOfIResult>> {
+export function wishlistNameItemsAddPost(http: HttpClient, rootUrl: string, params: WishlistNameItemsAddPost$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
   const rb = new RequestBuilder(rootUrl, wishlistNameItemsAddPost.PATH, 'post');
   if (params) {
     rb.path('name', params.name, {});
@@ -23,11 +22,11 @@ export function wishlistNameItemsAddPost(http: HttpClient, rootUrl: string, para
   }
 
   return http.request(
-    rb.build({ responseType: 'json', accept: 'application/json', context })
+    rb.build({ responseType: 'text', accept: '*/*', context })
   ).pipe(
     filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
     map((r: HttpResponse<any>) => {
-      return r as StrictHttpResponse<TaskOfIResult>;
+      return (r as HttpResponse<any>).clone({ body: undefined }) as StrictHttpResponse<void>;
     })
   );
 }
