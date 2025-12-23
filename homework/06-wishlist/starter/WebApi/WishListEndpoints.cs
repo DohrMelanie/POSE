@@ -36,14 +36,14 @@ public static class WishListEndpoints
 
         app.MapPost("/wishlist/{name}/items/add",
             async (ApplicationDataContext db, string name, [FromBody] AddItemReq addItemReq) =>
-            HandleAddItem(db, name, addItemReq))
+            await HandleAddItem(db, name, addItemReq))
             .Accepts<AddItemReq>("application/json")
             .Produces(StatusCodes.Status401Unauthorized)
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status200OK);
 
         app.MapGet("/gift-categories",
-            async (ApplicationDataContext db) => db.GiftCategories.Select(c => c.Name).ToList())
+            (ApplicationDataContext db) => db.GiftCategories.Select(c => c.Name).ToList())
             .Produces<string[]>(StatusCodes.Status200OK);
 
         return app;
@@ -58,7 +58,7 @@ public static class WishListEndpoints
             return Results.NotFound();
         }
 
-        if (authReq.Pin != wishlist.ParentPin && authReq.Pin != wishlist.ChildPin)
+        if (authReq.Pin.ToLower() != wishlist.ParentPin.ToLower() && authReq.Pin.ToLower() != wishlist.ChildPin.ToLower())
         {
             return Results.Unauthorized();
         }
@@ -165,7 +165,7 @@ public static class WishListEndpoints
 
     private static Role GetRole(Wishlist wishlist, AuthReq authReq)
     {
-        return wishlist.ParentPin == authReq.Pin ? Role.Parent : Role.Child;
+        return string.Equals(wishlist.ParentPin, authReq.Pin, StringComparison.OrdinalIgnoreCase) ? Role.Parent : Role.Child;
     }
 
     public record AuthReq(
