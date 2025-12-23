@@ -11,3 +11,4 @@ export type { TaskCreationOptions } from './models/task-creation-options';
 export type { TaskOfIResult } from './models/task-of-i-result';
 export type { TaskStatus } from './models/task-status';
 export type { VerifyPinResp } from './models/verify-pin-resp';
+export type { WishlistItemResp } from './models/wishlist-item-resp';

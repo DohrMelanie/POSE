@@ -8,13 +8,14 @@ import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
 import { AuthReq } from '../../models/auth-req';
+import { WishlistItemResp } from '../../models/wishlist-item-resp';
 
 export interface WishlistNameItemsPost$Params {
   name: string;
       body: AuthReq
 }
 
-export function wishlistNameItemsPost(http: HttpClient, rootUrl: string, params: WishlistNameItemsPost$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
+export function wishlistNameItemsPost(http: HttpClient, rootUrl: string, params: WishlistNameItemsPost$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<WishlistItemResp>>> {
   const rb = new RequestBuilder(rootUrl, wishlistNameItemsPost.PATH, 'post');
   if (params) {
     rb.path('name', params.name, {});
@@ -22,11 +23,11 @@ export function wishlistNameItemsPost(http: HttpClient, rootUrl: string, params:
   }
 
   return http.request(
-    rb.build({ responseType: 'text', accept: '*/*', context })
+    rb.build({ responseType: 'json', accept: 'application/json', context })
   ).pipe(
     filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
     map((r: HttpResponse<any>) => {
-      return (r as HttpResponse<any>).clone({ body: undefined }) as StrictHttpResponse<void>;
+      return r as StrictHttpResponse<Array<WishlistItemResp>>;
     })
   );
 }

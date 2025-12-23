@@ -78,7 +78,17 @@
         },
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WishlistItemResp"
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -159,8 +169,8 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "OK"
+          "204": {
+            "description": "No Content"
           }
         }
       }
@@ -396,6 +406,30 @@
         "properties": {
           "role": {
             "type": "string"
+          }
+        }
+      },
+      "WishlistItemResp": {
+        "required": [
+          "id",
+          "itemName",
+          "category",
+          "bought"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "itemName": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string"
+          },
+          "bought": {
+            "type": "boolean"
           }
         }
       }

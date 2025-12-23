@@ -19,15 +19,17 @@ public static class WishListEndpoints
         app.MapPost("/wishlist/{name}/items",
                 async (ApplicationDataContext db, string name, [FromBody] AuthReq authReq) =>
                 await HandleRetrieveWishlistItems(db, name, authReq))
-            .Produces(StatusCodes.Status200OK);
+            .Produces<WishlistItemResp[]>(StatusCodes.Status200OK);
 
         app.MapPost("/wishlist/{name}/items/{itemId:int}/mark-as-bought",
             async (ApplicationDataContext db, string name, int itemId, [FromBody] AuthReq authReq) =>
-            await HandleMarkAsBought(db, name, itemId, authReq));
+            await HandleMarkAsBought(db, name, itemId, authReq))
+            .Produces(StatusCodes.Status200OK);
 
-        app.MapDelete("/wishlist/{name}/items/{itemId}",
+        app.MapDelete("/wishlist/{name}/items/{itemId:int}",
             async (ApplicationDataContext db, string name, int itemId, [FromBody] AuthReq authReq) =>
-            await HandleDeleteItem(db, name, itemId, authReq));
+            await HandleDeleteItem(db, name, itemId, authReq))
+            .Produces(StatusCodes.Status204NoContent);
 
         app.MapPost("/wishlist/{name}/items/add",
             async (ApplicationDataContext db, string name, [FromBody] AddItemReq addItemReq) =>
@@ -70,9 +72,15 @@ public static class WishListEndpoints
             return Results.Unauthorized();
         }
         
-        await db.Entry(wishlist).Collection(w => w.Items).LoadAsync();
+        var items = await db.WishlistItems
+            .AsNoTracking()
+            .Where(i => i.WishlistId == wishlist.Id)
+            .Include(i => i.Category)
+            .OrderBy(i => i.Id)
+            .Select(i => new WishlistItemResp(i.Id, i.ItemName, i.Category.Name, i.Bought))
+            .ToListAsync();
 
-        return Results.Ok(wishlist.Items);
+        return Results.Ok(items);
     }
 
     private static async Task<IResult> HandleMarkAsBought(ApplicationDataContext db, string name, int itemId,
@@ -88,8 +96,12 @@ public static class WishListEndpoints
         {
             return Results.Unauthorized();
         }
-
-        wishlist.Items.First(i => i.Id == itemId).Bought = true;
+        var item = wishlist.Items.FirstOrDefault(i => i.Id == itemId);
+        if (item == null)
+        {
+            return Results.NotFound($"Item with id {itemId} not found.");
+        }
+        item.Bought = !item.Bought;
         await db.SaveChangesAsync();
         return Results.Ok();
     }
@@ -160,6 +172,13 @@ public static class WishListEndpoints
         string ItemName,
         string Category,
         string Pin
+    );
+
+    public record WishlistItemResp(
+        int Id,
+        string ItemName,
+        string Category,
+        bool Bought
     );
 
     public enum Role

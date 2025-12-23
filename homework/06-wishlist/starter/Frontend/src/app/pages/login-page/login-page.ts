@@ -22,10 +22,8 @@ export class LoginPage {
   private readonly router = inject(Router);
 
   private readonly sessionService = inject(SessionService);
-  protected readonly pin = signal<string | null>(null);
   protected readonly error = signal<string | null>(null);
   protected readonly saving = signal<boolean>(false);
-  protected readonly name = signal<string | null>(null);
 
   protected readonly loginModel = signal<LoginModel>({
     name: '',
@@ -39,6 +37,8 @@ export class LoginPage {
     minLength(schemaPath.pin, 6, { message: 'PIN must 6 characters' });
     maxLength(schemaPath.name, 100, { message: 'Name must be at most 100 characters' });
   });
+
+
 
   protected async onSubmit(event: Event) {
     event.preventDefault();
@@ -62,7 +62,6 @@ export class LoginPage {
           wishListName: name
         } 
       });
-      console.log(response);
       const role = response.role?.toLowerCase();
       if (role !== 'parent' && role !== 'child') {
         this.error.set('Invalid PIN');
