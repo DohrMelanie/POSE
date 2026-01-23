@@ -10,6 +10,16 @@ public static class TravelEndpoints
         var group = app.MapGroup("/travels")
             .WithTags("Travels");
 
+        group.MapGet("/", GetTravels)
+            .WithName("GetTravels")
+            .WithDescription("Returns a list of travel entries.")
+            .Produces<TravelListItemDto[]>(StatusCodes.Status200OK);
+
+        group.MapGet("/{id:int}", GetTravelDetailsById)
+            .WithName("GetTravelDetailsById")
+            .WithDescription("Returns the detail of a travel.")
+            .Produces<TravelDetailsDto>(StatusCodes.Status200OK);
+
         // TODO: Add additional endpoints here
 
         group.MapPost("/upload", UploadTravelFile)
@@ -125,7 +135,8 @@ public static class TravelEndpoints
 
                 default:
                     // This should normally not happen unless parsing created an unknown reimbursement type.
-                    return Results.BadRequest(new TravelUploadErrorDto("InvalidEntryType", "Unknown reimbursement type."));
+                    return Results.BadRequest(new TravelUploadErrorDto("InvalidEntryType",
+                        "Unknown reimbursement type."));
             }
         }
 
@@ -158,31 +169,53 @@ public static class TravelEndpoints
             travel.Mileage,
             travel.PerDiem,
             travel.Expenses,
-            [.. travel.Reimbursements
-                .OrderBy(r => r.Id)
-                .Select(r => r switch
-                {
-                    DriveWithPrivateCarReimbursementEntity drive => new TravelReimbursementDto(
-                        Id: drive.Id,
-                        Type: "DRIVE",
-                        Description: drive.Description,
-                        Km: drive.KM,
-                        Amount: null),
+            [
+                .. travel.Reimbursements
+                    .OrderBy(r => r.Id)
+                    .Select(r => r switch
+                    {
+                        DriveWithPrivateCarReimbursementEntity drive => new TravelReimbursementDto(
+                            Id: drive.Id,
+                            Type: "DRIVE",
+                            Description: drive.Description,
+                            Km: drive.KM,
+                            Amount: null),
 
-                    ExpenseReimbursementEntity expense => new TravelReimbursementDto(
-                        Id: expense.Id,
-                        Type: "EXPENSE",
-                        Description: expense.Description,
-                        Km: null,
-                        Amount: expense.Amount),
+                        ExpenseReimbursementEntity expense => new TravelReimbursementDto(
+                            Id: expense.Id,
+                            Type: "EXPENSE",
+                            Description: expense.Description,
+                            Km: null,
+                            Amount: expense.Amount),
 
-                    _ => new TravelReimbursementDto(
-                        Id: r.Id,
-                        Type: "UNKNOWN",
-                        Description: r.Description,
-                        Km: null,
-                        Amount: null)
-                })]);
+                        _ => new TravelReimbursementDto(
+                            Id: r.Id,
+                            Type: "UNKNOWN",
+                            Description: r.Description,
+                            Km: null,
+                            Amount: null)
+                    })
+            ]);
+
+    private static async Task<IResult> GetTravels(ApplicationDataContext db)
+    {
+        var travels = await db.Travels.Select(t => new TravelListItemDto(t.Id, t.TravelerName, t.Purpose))
+            .ToListAsync();
+        return Results.Ok(travels);
+    }
+
+    private static async Task<IResult> GetTravelDetailsById(int id, ApplicationDataContext db)
+    {
+        var travel = await db.Travels
+            .Include(t => t.Reimbursements)
+            .FirstOrDefaultAsync(t => t.Id == id);
+        if (travel == null)
+        {
+            return Results.NotFound();
+        }
+
+        return Results.Ok(MapToDetailsDto(travel));
+    }
 }
 
 public record TravelListItemDto(int Id, string TravelerName, string Purpose);

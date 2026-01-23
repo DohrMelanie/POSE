@@ -8,23 +8,30 @@
     <a class="button" routerLink="/travels/upload">Upload travel file</a>
     
     <!-- Trigger loading, disable while loading -->
-    <button class="button secondary">Refresh</button>
+    <button class="button secondary" [disabled]="loading()">Refresh</button>
   </div>
 </div>
 
 <!-- Loading indicator, display only while loading -->
+ @if(loading()) {
   <p class="hint">Loading…</p>
+ }
 
 <!-- Error message, display only if error -->
+ @if(error()) {
   <div class="alert error">
-    <strong>Error:</strong> {{ 'TODO' }}
+    <strong>Error:</strong> {{ error() }}
   </div>
+ }
+
 
 <!-- Empty state, display only if no travels -->
+ @if(travels().length === 0) {
   <div class="empty">
     <p>No travels yet.</p>
     <p class="hint">Upload a travel file to get started.</p>
   </div>
+ }
 
 <!-- Travels table, display only if travels exist -->
   <div class="card">
@@ -39,16 +46,18 @@
       </thead>
       <tbody>
         <!-- Repeat for each travel -->
+         @for(travel of travels(); track travel.id) {
           <tr>
             <!-- Add data binding -->
-            <td class="mono">{{ 'TODO' }}</td>
-            <td>{{ 'TODO' }}</td>
-            <td>{{ 'TODO' }}</td>
+            <td class="mono">{{ travel.id }}</td>
+            <td>{{ travel.travelerName }}</td>
+            <td>{{ travel.purpose }}</td>
             <td class="right">
               <!-- Replace 42 with actual travel id -->
-              <a class="button small" [routerLink]="['/travels', 42]">Details</a>
+              <a class="button small" [routerLink]="['/travels', travel.id]">Details</a>
             </td>
           </tr>
+        }
       </tbody>
     </table>
   </div>

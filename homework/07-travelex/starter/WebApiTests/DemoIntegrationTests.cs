@@ -9,7 +9,6 @@ public class DemoIntegrationTests(WebApiTestFixture fixture) : IClassFixture<Web
     {
         // Act
         var response = await fixture.HttpClient.GetAsync("/ping");
-
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var content = await response.Content.ReadAsStringAsync();

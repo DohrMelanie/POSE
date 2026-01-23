@@ -3,5 +3,9 @@
 
 export type { PingGet$Params as PingGet$Params } from './fn/web-api/ping-get';
 export { pingGet as pingGet } from './fn/web-api/ping-get';
+export type { GetTravels$Params as GetTravels$Params } from './fn/travels/get-travels';
+export { getTravels as getTravels } from './fn/travels/get-travels';
+export type { GetTravelDetailsById$Params as GetTravelDetailsById$Params } from './fn/travels/get-travel-details-by-id';
+export { getTravelDetailsById as getTravelDetailsById } from './fn/travels/get-travel-details-by-id';
 export type { TravelsUploadPost$Params as TravelsUploadPost$Params } from './fn/travels/travels-upload-post';
 export { travelsUploadPost as travelsUploadPost } from './fn/travels/travels-upload-post';
