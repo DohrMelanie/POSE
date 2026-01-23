@@ -15,12 +15,18 @@ public class ReimbursementCalculator : IReimbursementCalculator
 {
     public ReimbursementResult CalculateReimbursement(Travel travel)
     {
+        if (travel == null)
+        {
+            throw new ArgumentNullException(nameof(travel));
+        }
+
         decimal mileage = 0;
         decimal perDiem = 0;
-        
+
         var hoursBetween = travel.End - travel.Start;
-        var hours = hoursBetween.TotalHours;
-        if (hours > 3.0)
+        var hours = Convert.ToDecimal(hoursBetween.TotalHours);
+
+        if (hours > 3.0m)
         {
             while (hours > 24)
             {
@@ -28,12 +34,11 @@ public class ReimbursementCalculator : IReimbursementCalculator
                 hours -= 24;
             }
 
-            perDiem += 2.5m;
+            perDiem += 2.5m * Math.Ceiling(hours);
         }
 
-        
         decimal expenses = 0;
-        
+
         foreach (var reimbursement in travel.Reimbursements)
         {
             if (reimbursement is DriveWithPrivateCarReimbursement driveReimbursement)
@@ -45,7 +50,7 @@ public class ReimbursementCalculator : IReimbursementCalculator
                 expenses += expenseReimbursement.Amount;
             }
         }
-        
-        return new ReimbursementResult(mileage, perDiem, expenses);
+
+        return new ReimbursementResult(mileage, Math.Round(perDiem, 2), expenses);
     }
 }
