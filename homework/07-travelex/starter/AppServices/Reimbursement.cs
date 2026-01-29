@@ -28,7 +28,7 @@ public class ReimbursementCalculator : IReimbursementCalculator
 
         if (hours > 3.0m)
         {
-            while (hours > 24)
+            while (hours >= 24)
             {
                 perDiem += 30;
                 hours -= 24;
@@ -49,6 +49,11 @@ public class ReimbursementCalculator : IReimbursementCalculator
             {
                 expenses += expenseReimbursement.Amount;
             }
+        }
+
+        if (mileage != 0)
+        {
+            expenses = 0;
         }
 
         return new ReimbursementResult(mileage, Math.Round(perDiem, 2), expenses);
