@@ -125,7 +125,7 @@ public static class OrderEndpoints
     {
         var result = serializer.Parse(data, out var bracelet);
         return Results.Ok(result == BraceletValidationResult.Ok ? 
-            new ValidationResult(result.ToString(), bracelet.HasMixedColors, bracelet.Cost) : 
+            new ValidationResult(null, bracelet.HasMixedColors, bracelet.Cost) : 
             new ValidationResult(result.ToString(), false, null));
     }
 }
