@@ -29,7 +29,27 @@ public record Bracelet
     /// Must already be validated.</param>
     internal Bracelet(IReadOnlyList<string> parts)
     {
-        // TODO: Implement the constructor to initialize the properties based on the provided parts.
-        throw new NotImplementedException();
+        Parts = parts;
+        Data = string.Join("|", parts);
+        Cost = (Data.Split('|').Length - 1) * 0.5m;
+        Cost += Data.Split('|')
+            .Sum(x => parts.ToList().IndexOf(x) % 2 == 0 ? 0 : 1);
+        if (Data.Length == 1)
+        {
+            Cost = 1;
+            HasMixedColors = false;
+        }
+        else
+        {
+            var color = parts[1];
+            for (var i = 0; i < parts.Count; i++)
+            {
+                if (i % 2 == 1 && parts[i] != color)
+                {
+                    HasMixedColors = true;
+                    break;
+                }
+            }
+        }
     }
 }

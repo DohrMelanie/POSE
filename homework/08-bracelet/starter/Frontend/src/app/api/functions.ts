@@ -3,3 +3,11 @@
 
 export type { ApiPingGet$Params as ApiPingGet$Params } from './fn/web-api/api-ping-get';
 export { apiPingGet as apiPingGet } from './fn/web-api/api-ping-get';
+export type { GetOrders$Params as GetOrders$Params } from './fn/order-endpoints/get-orders';
+export { getOrders as getOrders } from './fn/order-endpoints/get-orders';
+export type { CreateOrder$Params as CreateOrder$Params } from './fn/order-endpoints/create-order';
+export { createOrder as createOrder } from './fn/order-endpoints/create-order';
+export type { GetOrderById$Params as GetOrderById$Params } from './fn/order-endpoints/get-order-by-id';
+export { getOrderById as getOrderById } from './fn/order-endpoints/get-order-by-id';
+export type { ValidateBracelet$Params as ValidateBracelet$Params } from './fn/order-endpoints/validate-bracelet';
+export { validateBracelet as validateBracelet } from './fn/order-endpoints/validate-bracelet';

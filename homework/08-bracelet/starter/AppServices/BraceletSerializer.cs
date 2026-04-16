@@ -64,7 +64,54 @@ public class BraceletSerializer : IBraceletSerializer
     /// <inheritdoc />
     public BraceletValidationResult Parse(string data, out Bracelet? bracelet)
     {
-        // TODO: Implement the parsing and validation logic according to the specified rules.
-        throw new NotImplementedException();
+        bracelet = null;
+
+        if (data == null || data.Trim().Length == 0)
+        {
+            return BraceletValidationResult.Empty;
+        }
+        var parts = data.Split('|').ToList();
+
+        if (parts.Count % 2 == 0)
+        {
+            return  BraceletValidationResult.EndsWithSpacer;
+        }
+        
+        if (parts.Count == 0)
+        {
+            return  BraceletValidationResult.Empty;
+        }
+        if (data[^1] == '|')
+        {
+            return BraceletValidationResult.InvalidLetter;
+        }
+
+        var count = 0;
+        for (var i = 0; i < parts.Count; i++)
+        {
+            if (i % 2 == 0)
+            {
+                if (!ValidLetters.Contains(parts[i]))
+                {
+                    return BraceletValidationResult.InvalidLetter;
+                }
+                count++;
+            }
+            else
+            {
+                if (!ValidColorNames.Contains(parts[i]))
+                {
+                    return BraceletValidationResult.InvalidColor;
+                }
+            }
+        }
+
+        if (count > 10)
+        {
+            return BraceletValidationResult.TooManyLetters;
+        }
+
+        bracelet = new Bracelet(parts);
+        return BraceletValidationResult.Ok;
     }
 }
