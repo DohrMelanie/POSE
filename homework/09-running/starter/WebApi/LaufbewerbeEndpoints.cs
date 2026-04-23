@@ -8,7 +8,8 @@ public static class LaufbewerbeEndpoints
     public static IEndpointRouteBuilder MapLaufbewerbeEndpoints(this IEndpointRouteBuilder app)
     {
         app.MapGet("/laufkategorien", GetCategories)
-            .WithName("GetCategories");
+            .WithName("GetCategories")
+            .Produces<List<CategoryDto>>(StatusCodes.Status200OK);
         
         app.MapGet("/laufbewerbe", GetCompetitions)
             .WithName("GetCompetitions")

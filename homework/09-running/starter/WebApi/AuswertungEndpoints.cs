@@ -15,9 +15,7 @@ public static class AuswertungEndpoints
             .Produces<EvaluationDto>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound);
         
-        // TODO: Add endpoints for Auswertung:
-        //   GET  /laufbewerbe/{id}/teilnehmer  - List all Teilnehmer for a Laufbewerb (sorted by Startnummer)
-        //   POST /laufbewerbe/auswertung       - Compute split evaluation for a Teilnehmer
+        // TODO   POST /laufbewerbe/auswertung       - Compute split evaluation for a Teilnehmer
 
         return app;
     }
