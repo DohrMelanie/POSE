@@ -8,7 +8,7 @@ public class CommandLineParser
     {
         if (args.Length == 0)
         {
-            throw new ArgumentException("Please provide a product file path as a command line argument.\nUsage: Importer <file-path> [--dry-run]");
+            throw new ArgumentException("Please provide a product file path as a command line argument.\nUsage: Importer <file-path> [--laufbewerb-id] [--dry-run]");
         }
 
         var filePath = args[0];

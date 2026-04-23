@@ -79,4 +79,9 @@ export class LaufbewerbEdit implements OnInit{
   async cancel() {
     this.router.navigate(["/laufbewerbe"]);
   }
+
+  async onCategoryChange(event: Event) {
+    let value = (event.target as HTMLSelectElement).value;
+    this.comp().category = this.categories().find(c => c.id == parseInt(value))!;
+  }
 }

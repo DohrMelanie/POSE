@@ -57,32 +57,10 @@ public class SplitCsvParser : ISplitCsvParser
         var lines = csvContent.Split(["\r\n", "\n"], StringSplitOptions.None)
             .Select(line =>  line.Trim())
             .ToArray();
-
-        if (lines[0] == string.Empty)
-        {
-            throw new SplitParseException(SplitImportError.MissingDescription);
-        }
         
-        if (lines[0].Length > 100)
-        {
-            throw new SplitParseException(SplitImportError.DescriptionTooLong);
-        }
+        ValidateHeader(lines);
         
-        if (lines[1] != string.Empty)
-        {
-            throw new SplitParseException(SplitImportError.MissingEmptyLine);
-        }
-
-        if (lines[2] != "Startnummer,Vorname,Nachname,AngestrebteGesamtzeit,KmNummer,Zeit")
-        {
-            throw new SplitParseException(SplitImportError.InvalidCsvHeader);
-        }
-
-        var currentFirstname = "";
-        var currentLastname = "";
-        var currentStartNr = -1;
-        var currentKm = 1;
-        var currentTotal = -1;
+        var currentRunner = (StartNr: -1, FirstName: "", LastName: "", TotalTime: -1, NextKm: 1);
 
         List<SplitRowData> rows = [];
         for (var i = 3; i < lines.Length - 1; i++)
@@ -110,75 +88,83 @@ public class SplitCsvParser : ISplitCsvParser
                 throw new SplitParseException(SplitImportError.MissingNachname);
             }
 
-            var totalTimeParts = parts[3].Split(":");
-            
-            if (totalTimeParts.Length is < 2 or > 3)
-            {
-                throw new SplitParseException(SplitImportError.InvalidAngestrebteGesamtzeit);
-            }
+            var totalTime = GetTime(parts[3].Split(":"), SplitImportError.InvalidAngestrebteGesamtzeit);
+            var time = GetTime(parts[5].Split(":"), SplitImportError.InvalidZeit);
 
-            var totalTime = 0;
-            for (var j = 0; j < totalTimeParts.Length; j++)
+            if (currentRunner.StartNr != -1 && currentRunner.StartNr == startNr)
             {
-                var current = int.Parse(totalTimeParts[j]);
-                if (current is < 0 or > 59)
+                if (currentRunner.FirstName != firstName
+                     || currentRunner.LastName != lastName
+                     || currentRunner.TotalTime != totalTime)
                 {
-                    throw new SplitParseException(SplitImportError.InvalidAngestrebteGesamtzeit);
+                    throw new SplitParseException(SplitImportError.InconsistentRunnerData);
                 }
-
-                totalTime += current * (int) Math.Pow(60, totalTimeParts.Length - j - 1);
+            }
+            else
+            {
+                currentRunner.NextKm = 1;
             }
             
             if (!int.TryParse(parts[4], out var kmNr) || kmNr < 0)
             {
                 throw new SplitParseException(SplitImportError.InvalidKmNummer);
             }
-            
-            
-            var timeParts = parts[5].Split(":");
-            
-            if (timeParts.Length != 2)
-            {
-                throw new SplitParseException(SplitImportError.InvalidZeit);
-            }
-            
-            var time = 0;
-            for (var j = 0; j < timeParts.Length; j++)
-            {
-                var current = int.Parse(timeParts[j]);
-                if (current is < 0 or > 59)
-                {
-                    throw new SplitParseException(SplitImportError.InvalidZeit);
-                }
 
-                time += current * (int) Math.Pow(60, timeParts.Length - j - 1);
-            }
-
-            if (currentStartNr != -1 && currentStartNr == startNr && (currentFirstname != parts[1] 
-                                                                      || currentLastname != parts[2] 
-                                                                      || (currentTotal != -1 && currentTotal != totalTime)))
-            {
-                throw new SplitParseException(SplitImportError.InconsistentRunnerData);
-            }
-
-            if (currentStartNr != startNr)
-            {
-                currentKm = 1;
-            }
-
-            if (kmNr != currentKm)
+            if (kmNr != currentRunner.NextKm)
             {
                 throw new SplitParseException(SplitImportError.KmNummerNotConsecutive);
             }
-            
-            rows.Add(new SplitRowData(startNr, firstName, lastName, totalTime, kmNr, time));
 
-            currentFirstname = firstName;
-            currentLastname = lastName;
-            currentStartNr = startNr;
-            currentTotal = totalTime;
-            currentKm++;
+            var row = new SplitRowData(startNr, firstName, lastName, totalTime, kmNr, time);
+            rows.Add(row);
+
+            currentRunner = (row.Startnummer, row.Vorname, row.Nachname, row.AngestrebteGesamtzeitSek, row.KmNummer + 1);
         }
         return new ParsedSplitData(lines[0], rows);
+    }
+
+    private static void ValidateHeader(string[] lines)
+    {
+        if (lines[0] == string.Empty)
+        {
+            throw new SplitParseException(SplitImportError.MissingDescription);
+        }
+        
+        if (lines[0].Length > 100)
+        {
+            throw new SplitParseException(SplitImportError.DescriptionTooLong);
+        }
+        
+        if (lines[1] != string.Empty)
+        {
+            throw new SplitParseException(SplitImportError.MissingEmptyLine);
+        }
+
+        if (lines[2] != "Startnummer,Vorname,Nachname,AngestrebteGesamtzeit,KmNummer,Zeit")
+        {
+            throw new SplitParseException(SplitImportError.InvalidCsvHeader);
+        }
+    }
+
+    private static int GetTime(string[] timeParts, SplitImportError error)
+    {
+        if (timeParts.Length is < 2 or > 3)
+        {
+            throw new SplitParseException(error);
+        }
+
+        var totalTime = 0;
+        for (var j = 0; j < timeParts.Length; j++)
+        {
+            var current = int.Parse(timeParts[j]);
+            if (current is < 0 or > 59)
+            {
+                throw new SplitParseException(error);
+            }
+
+            totalTime += current * (int) Math.Pow(60, timeParts.Length - j - 1);
+        }
+
+        return totalTime;
     }
 }

@@ -13,7 +13,7 @@ export type { GetCompetitionById$Params as GetCompetitionById$Params } from './f
 export { getCompetitionById as getCompetitionById } from './fn/laufbewerbe-endpoints/get-competition-by-id';
 export type { DeleteCompetition$Params as DeleteCompetition$Params } from './fn/laufbewerbe-endpoints/delete-competition';
 export { deleteCompetition as deleteCompetition } from './fn/laufbewerbe-endpoints/delete-competition';
-export type { LaufbewerbeIdTeilnehmerGet$Params as LaufbewerbeIdTeilnehmerGet$Params } from './fn/auswertung-endpoints/laufbewerbe-id-teilnehmer-get';
-export { laufbewerbeIdTeilnehmerGet as laufbewerbeIdTeilnehmerGet } from './fn/auswertung-endpoints/laufbewerbe-id-teilnehmer-get';
-export type { LaufbewerbeAuswertungPost$Params as LaufbewerbeAuswertungPost$Params } from './fn/auswertung-endpoints/laufbewerbe-auswertung-post';
-export { laufbewerbeAuswertungPost as laufbewerbeAuswertungPost } from './fn/auswertung-endpoints/laufbewerbe-auswertung-post';
+export type { GetParticipants$Params as GetParticipants$Params } from './fn/auswertung-endpoints/get-participants';
+export { getParticipants as getParticipants } from './fn/auswertung-endpoints/get-participants';
+export type { ComputeEvaluation$Params as ComputeEvaluation$Params } from './fn/auswertung-endpoints/compute-evaluation';
+export { computeEvaluation as computeEvaluation } from './fn/auswertung-endpoints/compute-evaluation';

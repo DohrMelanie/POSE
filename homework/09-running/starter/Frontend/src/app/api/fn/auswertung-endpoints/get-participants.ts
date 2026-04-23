@@ -9,12 +9,12 @@ import { RequestBuilder } from '../../request-builder';
 
 import { ParticipantDto } from '../../models/participant-dto';
 
-export interface LaufbewerbeIdTeilnehmerGet$Params {
+export interface GetParticipants$Params {
   id: number;
 }
 
-export function laufbewerbeIdTeilnehmerGet(http: HttpClient, rootUrl: string, params: LaufbewerbeIdTeilnehmerGet$Params, context?: HttpContext): Observable<StrictHttpResponse<ParticipantDto>> {
-  const rb = new RequestBuilder(rootUrl, laufbewerbeIdTeilnehmerGet.PATH, 'get');
+export function getParticipants(http: HttpClient, rootUrl: string, params: GetParticipants$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<ParticipantDto>>> {
+  const rb = new RequestBuilder(rootUrl, getParticipants.PATH, 'get');
   if (params) {
     rb.path('id', params.id, {});
   }
@@ -24,9 +24,9 @@ export function laufbewerbeIdTeilnehmerGet(http: HttpClient, rootUrl: string, pa
   ).pipe(
     filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
     map((r: HttpResponse<any>) => {
-      return r as StrictHttpResponse<ParticipantDto>;
+      return r as StrictHttpResponse<Array<ParticipantDto>>;
     })
   );
 }
 
-laufbewerbeIdTeilnehmerGet.PATH = '/laufbewerbe/{id}/teilnehmer';
+getParticipants.PATH = '/laufbewerbe/{id}/teilnehmer';

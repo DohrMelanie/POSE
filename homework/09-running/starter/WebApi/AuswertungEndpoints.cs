@@ -8,14 +8,14 @@ public static class AuswertungEndpoints
     public static IEndpointRouteBuilder MapAuswertungEndpoints(this IEndpointRouteBuilder app)
     {
         app.MapGet("/laufbewerbe/{id:int}/teilnehmer", GetParticipants)
-            .Produces<ParticipantDto>(StatusCodes.Status200OK)
-            .Produces(StatusCodes.Status404NotFound);
+            .Produces<ParticipantDto[]>(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status404NotFound)
+            .WithName("GetParticipants");
         
         app.MapPost("/laufbewerbe/auswertung", ComputeEvaluation)
             .Produces<EvaluationDto>(StatusCodes.Status200OK)
-            .Produces(StatusCodes.Status404NotFound);
-        
-        // TODO   POST /laufbewerbe/auswertung       - Compute split evaluation for a Teilnehmer
+            .Produces(StatusCodes.Status404NotFound)
+            .WithName("ComputeEvaluation");
 
         return app;
     }
@@ -38,12 +38,41 @@ public static class AuswertungEndpoints
 
     private static async Task<IResult> ComputeEvaluation(ApplicationDataContext db, EvalReqDto req)
     {
-        throw new NotImplementedException();
+        var participant = await db.Teilnehmer
+            .Include(t => t.Laufbewerb)
+            .Include(t => t.Splits)
+            .FirstOrDefaultAsync(t => t.LaufbewerbId == req.CompId && t.Id == req.ParticipantId);
+
+        if (participant == null ||  participant.Splits.Count == 0)
+        {
+            return Results.NotFound();
+        }
+
+        var targetVelocity = (participant.Laufbewerb!.Streckenlänge / participant.AngestrebteGesamtzeit) * 3600;
+
+        var splits = participant.Splits.Select(s => new SplitDto(
+            s.KmNummer,
+            s.SegmentLaenge,
+            s.ZeitSekunden,
+            (s.SegmentLaenge / s.ZeitSekunden) * 3600,
+            (s.SegmentLaenge / s.ZeitSekunden) * 3600 <= targetVelocity
+        )).ToList();
+
+        var totalTime = splits.Sum(s => s.Time);
+        
+        var calculation = new EvaluationDto(
+            totalTime, 
+            (int)(participant.Laufbewerb.Streckenlänge / totalTime) * 3600,
+            totalTime <= participant.AngestrebteGesamtzeit, 
+            splits);
+        
+        return Results.Ok(calculation);
     }
 }
 
 public record EvalReqDto(
-    int ParticipantId);
+    int ParticipantId,
+    int CompId);
 
 public record ParticipantDto(
     int Id,
@@ -59,7 +88,7 @@ public record EvaluationDto(
     
 public record SplitDto(
     int Km,
-    int Length,
-    string Time,
-    string AvgVelocity,
+    decimal Length,
+    int Time,
+    decimal AvgVelocity,
     bool GoalAchieved);

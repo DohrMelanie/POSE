@@ -10,12 +10,12 @@ import { RequestBuilder } from '../../request-builder';
 import { EvalReqDto } from '../../models/eval-req-dto';
 import { EvaluationDto } from '../../models/evaluation-dto';
 
-export interface LaufbewerbeAuswertungPost$Params {
+export interface ComputeEvaluation$Params {
       body: EvalReqDto
 }
 
-export function laufbewerbeAuswertungPost(http: HttpClient, rootUrl: string, params: LaufbewerbeAuswertungPost$Params, context?: HttpContext): Observable<StrictHttpResponse<EvaluationDto>> {
-  const rb = new RequestBuilder(rootUrl, laufbewerbeAuswertungPost.PATH, 'post');
+export function computeEvaluation(http: HttpClient, rootUrl: string, params: ComputeEvaluation$Params, context?: HttpContext): Observable<StrictHttpResponse<EvaluationDto>> {
+  const rb = new RequestBuilder(rootUrl, computeEvaluation.PATH, 'post');
   if (params) {
     rb.body(params.body, 'application/json');
   }
@@ -30,4 +30,4 @@ export function laufbewerbeAuswertungPost(http: HttpClient, rootUrl: string, par
   );
 }
 
-laufbewerbeAuswertungPost.PATH = '/laufbewerbe/auswertung';
+computeEvaluation.PATH = '/laufbewerbe/auswertung';

@@ -25,9 +25,9 @@
 
           <div class="field">
             <label for="laufkategorieId">Laufkategorie</label>
-            <select id="laufkategorieId" [formField]="form.category.name" [class.invalid]="form.category().touched()">
+            <select id="laufkategorieId" (change)="onCategoryChange($event)" [formField]="form.category.name" [class.invalid]="form.category().touched()">
                @for (category of categories(); track category.id) {
-                <option>{{ category.name }}</option>
+                <option [value]="category.id">{{ category.name }}</option>
                }
             </select>
           </div>

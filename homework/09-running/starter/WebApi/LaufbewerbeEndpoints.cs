@@ -29,11 +29,6 @@ public static class LaufbewerbeEndpoints
         
         app.MapPut("/laufbewerbe", UpdateCompetition)
             .WithName("UpdateCompetition");
-        
-        // TODO: Add endpoints for Laufbewerbe management:
-        //   POST /laufbewerbe          - Create a new Laufbewerb (with validation)
-        //   PATCH /laufbewerbe/{id}    - Partially update a Laufbewerb (with validation)
-        //   DELETE /laufbewerbe/{id}   - Delete a Laufbewerb
 
         return app;
     }
@@ -49,6 +44,7 @@ public static class LaufbewerbeEndpoints
     private static async Task<IResult> GetCompetitions(ApplicationDataContext db, string? name, int? categoryId)
     {
         var competitions = await db.Laufbewerbe
+            .Include(l => l.Laufkategorie)
             .Select(k => new CompetitionDto(k.Id, k.Name, new CategoryDto(k.LaufkategorieId, k.Laufkategorie!.Bezeichnung), k.Streckenlänge, k.Datum, k.Ort))
             .ToListAsync();
 
@@ -68,8 +64,8 @@ public static class LaufbewerbeEndpoints
     }
     private static async Task<IResult> GetCompetitionById(ApplicationDataContext db, int id)
     {
-        var comp = await db.Laufbewerbe.FirstOrDefaultAsync(k => k.Id == id);
-        return comp  == null ? Results.NotFound() : Results.Ok(comp);
+        var k = await db.Laufbewerbe.Include(l => l.Laufkategorie).FirstOrDefaultAsync(k => k.Id == id);
+        return k  == null ? Results.NotFound() : Results.Ok(new CompetitionDto(k.Id, k.Name, new CategoryDto(k.LaufkategorieId, k.Laufkategorie!.Bezeichnung), k.Streckenlänge, k.Datum, k.Ort));
     }
     private static async Task<IResult> CreateCompetition(ApplicationDataContext db, CompetitionReqDto dto)
     {
@@ -82,7 +78,7 @@ public static class LaufbewerbeEndpoints
         {
             return Results.BadRequest("Length too short.");
         } // todo max 2 decimal places
-
+        
         if (dto.Place.Length > 100)
         {
             return Results.BadRequest("Place too long (max. 100 chars)");
@@ -121,7 +117,20 @@ public static class LaufbewerbeEndpoints
         {
             return Results.NotFound();
         }
+        if (dto.Name.Length > 100)
+        {
+            return Results.BadRequest("Name too long (max. 100 chars)");
+        }
+
+        if (dto.Length < 0.01m)
+        {
+            return Results.BadRequest("Length too short.");
+        } // todo max 2 decimal places
         
+        if (dto.Place.Length > 100)
+        {
+            return Results.BadRequest("Place too long (max. 100 chars)");
+        }
         var category = await db.Laufkategorien.FirstOrDefaultAsync(c => c.Id == dto.Category.Id);
         
         comp.Name = dto.Name;

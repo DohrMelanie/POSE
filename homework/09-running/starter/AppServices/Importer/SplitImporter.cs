@@ -79,6 +79,9 @@ public class SplitImporter(
             Teilnehmer = participant,
             TeilnehmerId = participant.Id,
         };
+        
+        participant.Splits.Add(split);
+        
         return split;
     }
 
@@ -90,6 +93,5 @@ public class SplitImporter(
         }
 
         return comp.Streckenlänge % 1;
-
     }
 }
