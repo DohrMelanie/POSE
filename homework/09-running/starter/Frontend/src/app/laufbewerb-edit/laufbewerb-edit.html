@@ -1,61 +1,79 @@
 <div class="container">
-  <!-- TODO: Add binding for title (different for add vs. edit) -->
-  <h1>{{ "title (Laufbewerb hinzufügen / Laufbewerb ändern)" }}</h1>
+  <h1>{{ title() }}</h1>
 
-  <!-- TODO: Show loading state while data is being fetched -->
-  <div class="state">Lade Daten...</div>
 
-  <!-- TODO: Show error state if loading/saving failed -->
-  <div class="state error">{{ "error message" }}</div>
+  @if(error()){
+    <div class="state error">{{ "error message" }}</div>
+  }
 
-  <!-- TODO: Only display form when not loading -->
-  <form>
-    <div class="grid">
-      <div class="field">
-        <label for="name">Name</label>
-        <!-- TODO: Add formField binding and invalid class -->
-        <input id="name" type="text" />
-        <!-- TODO: Show validation errors when touched and invalid -->
-      </div>
+  @if(loading()) {
+    <div class="state">Lade Daten...</div>
+   }@else {
+      <form>
+        <div class="grid">
+          <div class="field">
+            <label for="name">Name</label>
+            <input id="name" [formField]="form.name" [class.invalid]="form.name().touched()" type="text" />
+            @if (form.name().touched() && form.name().invalid()) {
+              <div class="error">
+                @for (e of form.name().errors(); track e) {
+                <div>{{ e.message }}</div>
+                }
+              </div>
+            }
+          </div>
 
-      <div class="field">
-        <label for="laufkategorieId">Laufkategorie</label>
-        <!-- TODO: Add formField binding and invalid class -->
-        <select id="laufkategorieId">
-          <!-- TODO: Repeat for each Laufkategorie -->
-          <option>{{ "kategorie.bezeichnung" }}</option>
-        </select>
-      </div>
+          <div class="field">
+            <label for="laufkategorieId">Laufkategorie</label>
+            <select id="laufkategorieId" [formField]="form.category.name" [class.invalid]="form.category().touched()">
+               @for (category of categories(); track category.id) {
+                <option>{{ category.name }}</option>
+               }
+            </select>
+          </div>
 
-      <div class="field">
-        <label for="streckenlänge">Streckenlänge (km)</label>
-        <!-- TODO: Add formField binding and invalid class -->
-        <input id="streckenlänge" type="number" step="0.01" />
-        <!-- TODO: Show validation errors when touched and invalid -->
-      </div>
+          <div class="field">
+            <label for="streckenlänge">Streckenlänge (km)</label>
+            <input id="streckenlänge" [formField]="form.length" [class.invalid]="form.length().touched()" type="number" step="0.01" />
+            @if (form.length().touched() && form.length().invalid()) {
+              <div class="error">
+                @for (e of form.length().errors(); track e) {
+                <div>{{ e.message }}</div>
+                }
+              </div>
+            }
+          </div>
 
-      <div class="field">
-        <label for="datum">Datum</label>
-        <!-- TODO: Add formField binding and invalid class -->
-        <input id="datum" type="date" />
-        <!-- TODO: Show validation errors when touched and invalid -->
-      </div>
+          <div class="field">
+            <label for="datum">Datum</label>
+            <input id="datum" type="date" [formField]="form.date" [class.invalid]="form.date().touched()" />
+            @if (form.date().touched() && form.date().invalid()) {
+              <div class="error">
+                @for (e of form.date().errors(); track e) {
+                <div>{{ e.message }}</div>
+                }
+              </div>
+            }          </div>
 
-      <div class="field">
-        <label for="ort">Ort</label>
-        <!-- TODO: Add formField binding and invalid class -->
-        <input id="ort" type="text" />
-        <!-- TODO: Show validation errors when touched and invalid -->
-      </div>
-    </div>
+          <div class="field">
+            <label for="ort">Ort</label>
+            <input id="ort" [formField]="form.place" [class.invalid]="form.place().touched()" type="text" />
+            @if (form.place().touched() && form.place().invalid()) {
+              <div class="error">
+                @for (e of form.place().errors(); track e) {
+                <div>{{ e.message }}</div>
+                }
+              </div>
+            }
+          </div>
+        </div>
 
-    <div class="actions">
-      <!-- TODO: Add disabled state and event binding -->
-      <button type="button">
-        {{ "Speichere... / Speichern depending on saving state" }}
-      </button>
-      <!-- TODO: Add event binding and disabled state -->
-      <button type="button">Abbrechen</button>
-    </div>
-  </form>
+        <div class="actions">
+          <button type="button" [disabled]="saving()" (click)="save()">
+            {{ saving() ? "Speichere..." : "Speichern" }}
+          </button>
+          <button type="button" (click)="cancel()" [disabled]="saving()">Abbrechen</button>
+        </div>
+      </form>
+    }
 </div>

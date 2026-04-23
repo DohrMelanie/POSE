@@ -6,11 +6,18 @@ public class CommandLineParser
 {
     public static CommandLineArgs Parse(string[] args)
     {
-        // TODO: Parse command line arguments:
-        // - First argument: CSV file path
-        // - --laufbewerb-id <id>: Required, must be a positive integer
-        // - --dry-run: Optional flag
-        // Throw ArgumentException with a descriptive message if arguments are invalid.
-        throw new NotImplementedException();
+        if (args.Length == 0)
+        {
+            throw new ArgumentException("Please provide a product file path as a command line argument.\nUsage: Importer <file-path> [--dry-run]");
+        }
+
+        var filePath = args[0];
+        var isDryRun = args.Any(arg => arg == "--dry-run");
+        var compId = args.FirstOrDefault(arg => int.TryParse(arg, out _));
+        if (compId == null || args.All(arg => arg != "--laufbewerb-id"))
+        {
+            throw new ArgumentException("Please provide a valid id");
+        }
+        return new CommandLineArgs(filePath, int.Parse(compId), isDryRun);
     }
 }
