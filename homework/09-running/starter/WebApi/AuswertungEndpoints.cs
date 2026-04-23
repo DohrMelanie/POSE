@@ -7,8 +7,8 @@ public static class AuswertungEndpoints
 {
     public static IEndpointRouteBuilder MapAuswertungEndpoints(this IEndpointRouteBuilder app)
     {
-        app.MapGet("/laufbewerbe/{id:int}/teilnehmer", GetPartitioners)
-            .Produces<PartitionerDto>(StatusCodes.Status200OK)
+        app.MapGet("/laufbewerbe/{id:int}/teilnehmer", GetParticipants)
+            .Produces<ParticipantDto>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound);
         
         app.MapPost("/laufbewerbe/auswertung", ComputeEvaluation)
@@ -20,11 +20,11 @@ public static class AuswertungEndpoints
         return app;
     }
 
-    private static async Task<IResult> GetPartitioners(ApplicationDataContext db, int id)
+    private static async Task<IResult> GetParticipants(ApplicationDataContext db, int id)
     {
         var parts = await db.Teilnehmer
             .Where(t => t.LaufbewerbId == id)
-            .Select(t => new PartitionerDto(t.Id, t.Startnummer, t.Vorname, t.Nachname))
+            .Select(t => new ParticipantDto(t.Id, t.Startnummer, t.Vorname, t.Nachname))
             .ToListAsync();
 
         if (parts.Count == 0)
@@ -43,9 +43,9 @@ public static class AuswertungEndpoints
 }
 
 public record EvalReqDto(
-    int PartitionerId);
+    int ParticipantId);
 
-public record PartitionerDto(
+public record ParticipantDto(
     int Id,
     int StartNr,
     string FirstName,

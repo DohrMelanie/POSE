@@ -6,5 +6,5 @@ export type { CompetitionDto } from './models/competition-dto';
 export type { CompetitionReqDto } from './models/competition-req-dto';
 export type { EvalReqDto } from './models/eval-req-dto';
 export type { EvaluationDto } from './models/evaluation-dto';
-export type { PartitionerDto } from './models/partitioner-dto';
+export type { ParticipantDto } from './models/participant-dto';
 export type { SplitDto } from './models/split-dto';

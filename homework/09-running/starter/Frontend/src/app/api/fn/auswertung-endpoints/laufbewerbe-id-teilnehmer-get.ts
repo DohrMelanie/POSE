@@ -7,13 +7,13 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
-import { PartitionerDto } from '../../models/partitioner-dto';
+import { ParticipantDto } from '../../models/participant-dto';
 
 export interface LaufbewerbeIdTeilnehmerGet$Params {
   id: number;
 }
 
-export function laufbewerbeIdTeilnehmerGet(http: HttpClient, rootUrl: string, params: LaufbewerbeIdTeilnehmerGet$Params, context?: HttpContext): Observable<StrictHttpResponse<PartitionerDto>> {
+export function laufbewerbeIdTeilnehmerGet(http: HttpClient, rootUrl: string, params: LaufbewerbeIdTeilnehmerGet$Params, context?: HttpContext): Observable<StrictHttpResponse<ParticipantDto>> {
   const rb = new RequestBuilder(rootUrl, laufbewerbeIdTeilnehmerGet.PATH, 'get');
   if (params) {
     rb.path('id', params.id, {});
@@ -24,7 +24,7 @@ export function laufbewerbeIdTeilnehmerGet(http: HttpClient, rootUrl: string, pa
   ).pipe(
     filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
     map((r: HttpResponse<any>) => {
-      return r as StrictHttpResponse<PartitionerDto>;
+      return r as StrictHttpResponse<ParticipantDto>;
     })
   );
 }

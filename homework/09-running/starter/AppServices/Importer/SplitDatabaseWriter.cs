@@ -6,6 +6,7 @@ namespace AppServices.Importer;
 public interface ISplitDatabaseWriter
 {
     Task WriteTeilnehmerAsync(IEnumerable<Teilnehmer> teilnehmer);
+    Task ClearTeilnehmerAsync();
     Task BeginTransactionAsync();
     Task CommitTransactionAsync();
     Task RollbackTransactionAsync();
@@ -18,6 +19,11 @@ public class SplitDatabaseWriter(ApplicationDataContext context) : ISplitDatabas
     public async Task WriteTeilnehmerAsync(IEnumerable<Teilnehmer> teilnehmer)
     {
         context.Teilnehmer.AddRange(teilnehmer);
+        await context.SaveChangesAsync();
+    }
+    public async Task ClearTeilnehmerAsync()
+    {
+        context.Teilnehmer.RemoveRange(context.Teilnehmer);
         await context.SaveChangesAsync();
     }
 

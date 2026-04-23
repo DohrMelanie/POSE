@@ -54,9 +54,131 @@ public class SplitCsvParser : ISplitCsvParser
 {
     public ParsedSplitData ParseCsv(string csvContent)
     {
-        // TODO: Implement the CSV parsing and validation logic.
-        // Parse the CSV content according to the format described in the specification.
-        // Throw SplitParseException with the appropriate SplitImportError for each validation failure.
-        throw new NotImplementedException();
+        var lines = csvContent.Split(["\r\n", "\n"], StringSplitOptions.None)
+            .Select(line =>  line.Trim())
+            .ToArray();
+
+        if (lines[0] == string.Empty)
+        {
+            throw new SplitParseException(SplitImportError.MissingDescription);
+        }
+        
+        if (lines[0].Length > 100)
+        {
+            throw new SplitParseException(SplitImportError.DescriptionTooLong);
+        }
+        
+        if (lines[1] != string.Empty)
+        {
+            throw new SplitParseException(SplitImportError.MissingEmptyLine);
+        }
+
+        if (lines[2] != "Startnummer,Vorname,Nachname,AngestrebteGesamtzeit,KmNummer,Zeit")
+        {
+            throw new SplitParseException(SplitImportError.InvalidCsvHeader);
+        }
+
+        var currentFirstname = "";
+        var currentLastname = "";
+        var currentStartNr = -1;
+        var currentKm = 1;
+        var currentTotal = -1;
+
+        List<SplitRowData> rows = [];
+        for (var i = 3; i < lines.Length - 1; i++)
+        {
+            var parts = lines[i].Split(",");
+            if (parts.Length != 6)
+            {
+                throw new SplitParseException(SplitImportError.IncorrectColumnCount);
+            }
+
+            if (!int.TryParse(parts[0], out var startNr) || startNr < 0)
+            {
+                throw new SplitParseException(SplitImportError.InvalidStartnummer);
+            }
+
+            var firstName = parts[1];
+            if (firstName == string.Empty)
+            {
+                throw new SplitParseException(SplitImportError.MissingVorname);
+            }
+
+            var lastName = parts[2];
+            if (lastName == string.Empty)
+            {
+                throw new SplitParseException(SplitImportError.MissingNachname);
+            }
+
+            var totalTimeParts = parts[3].Split(":");
+            
+            if (totalTimeParts.Length is < 2 or > 3)
+            {
+                throw new SplitParseException(SplitImportError.InvalidAngestrebteGesamtzeit);
+            }
+
+            var totalTime = 0;
+            for (var j = 0; j < totalTimeParts.Length; j++)
+            {
+                var current = int.Parse(totalTimeParts[j]);
+                if (current is < 0 or > 59)
+                {
+                    throw new SplitParseException(SplitImportError.InvalidAngestrebteGesamtzeit);
+                }
+
+                totalTime += current * (int) Math.Pow(60, totalTimeParts.Length - j - 1);
+            }
+            
+            if (!int.TryParse(parts[4], out var kmNr) || kmNr < 0)
+            {
+                throw new SplitParseException(SplitImportError.InvalidKmNummer);
+            }
+            
+            
+            var timeParts = parts[5].Split(":");
+            
+            if (timeParts.Length != 2)
+            {
+                throw new SplitParseException(SplitImportError.InvalidZeit);
+            }
+            
+            var time = 0;
+            for (var j = 0; j < timeParts.Length; j++)
+            {
+                var current = int.Parse(timeParts[j]);
+                if (current is < 0 or > 59)
+                {
+                    throw new SplitParseException(SplitImportError.InvalidZeit);
+                }
+
+                time += current * (int) Math.Pow(60, timeParts.Length - j - 1);
+            }
+
+            if (currentStartNr != -1 && currentStartNr == startNr && (currentFirstname != parts[1] 
+                                                                      || currentLastname != parts[2] 
+                                                                      || (currentTotal != -1 && currentTotal != totalTime)))
+            {
+                throw new SplitParseException(SplitImportError.InconsistentRunnerData);
+            }
+
+            if (currentStartNr != startNr)
+            {
+                currentKm = 1;
+            }
+
+            if (kmNr != currentKm)
+            {
+                throw new SplitParseException(SplitImportError.KmNummerNotConsecutive);
+            }
+            
+            rows.Add(new SplitRowData(startNr, firstName, lastName, totalTime, kmNr, time));
+
+            currentFirstname = firstName;
+            currentLastname = lastName;
+            currentStartNr = startNr;
+            currentTotal = totalTime;
+            currentKm++;
+        }
+        return new ParsedSplitData(lines[0], rows);
     }
 }
