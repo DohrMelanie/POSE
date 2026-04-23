@@ -7,16 +7,146 @@ public static class LaufbewerbeEndpoints
 {
     public static IEndpointRouteBuilder MapLaufbewerbeEndpoints(this IEndpointRouteBuilder app)
     {
+        app.MapGet("/laufkategorien", GetCategories)
+            .WithName("GetCategories");
+        
+        app.MapGet("/laufbewerbe", GetCompetitions)
+            .WithName("GetCompetitions")
+            .Produces<List<CompetitionDto>>(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status404NotFound);
+        
+        app.MapGet("/laufbewerbe/{id:int}", GetCompetitionById)
+            .WithName("GetCompetitionById")
+            .Produces<CompetitionDto>(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status404NotFound);
+        
+        app.MapPost("/laufbewerbe", CreateCompetition)
+            .WithName("CreateCompetition");
+        
+        app.MapDelete("/laufbewerbe/{id:int}", DeleteCompetition)
+            .WithName("DeleteCompetition");
+        
+        app.MapPut("/laufbewerbe", UpdateCompetition)
+            .WithName("UpdateCompetition");
+        
         // TODO: Add endpoints for Laufbewerbe management:
-        //   GET  /laufkategorien       - List all Laufkategorien
-        //   GET  /laufbewerbe          - List all Laufbewerbe (filtered by name, laufkategorieId; sorted by Datum DESC)
-        //   GET  /laufbewerbe/{id}     - Get a Laufbewerb by id
         //   POST /laufbewerbe          - Create a new Laufbewerb (with validation)
         //   PATCH /laufbewerbe/{id}    - Partially update a Laufbewerb (with validation)
         //   DELETE /laufbewerbe/{id}   - Delete a Laufbewerb
 
         return app;
     }
+
+    private static async Task<IResult> GetCategories(ApplicationDataContext db)
+    {
+        var categories = await db.Laufkategorien
+            .Select(k => new CategoryDto(k.Id, k.Bezeichnung))
+            .ToListAsync();
+        
+        return Results.Ok(categories);
+    }
+    private static async Task<IResult> GetCompetitions(ApplicationDataContext db, string? name, int? categoryId)
+    {
+        var competitions = await db.Laufbewerbe
+            .Select(k => new CompetitionDto(k.Id, k.Name, new CategoryDto(k.LaufkategorieId, k.Laufkategorie!.Bezeichnung), k.Streckenlänge, k.Datum, k.Ort))
+            .ToListAsync();
+
+        if (name != null)
+        {
+            competitions = competitions.Where(c => c.Name == name).ToList();
+        }
+
+        if (categoryId != null)
+        {
+            competitions = competitions.Where(c => c.Category.Id == categoryId).ToList();
+        }
+
+        competitions = competitions.OrderByDescending(dto => dto.Date).ToList();
+
+        return competitions.Count == 0 ? Results.NotFound() : Results.Ok(competitions);
+    }
+    private static async Task<IResult> GetCompetitionById(ApplicationDataContext db, int id)
+    {
+        var comp = await db.Laufbewerbe.FirstOrDefaultAsync(k => k.Id == id);
+        return comp  == null ? Results.NotFound() : Results.Ok(comp);
+    }
+    private static async Task<IResult> CreateCompetition(ApplicationDataContext db, CompetitionReqDto dto)
+    {
+        if (dto.Name.Length > 100)
+        {
+            return Results.BadRequest("Name too long (max. 100 chars)");
+        }
+
+        if (dto.Length < 0.01m)
+        {
+            return Results.BadRequest("Length too short.");
+        } // todo max 2 decimal places
+
+        if (dto.Place.Length > 100)
+        {
+            return Results.BadRequest("Place too long (max. 100 chars)");
+        }
+
+        var category = await db.Laufkategorien.FirstOrDefaultAsync(c => c.Id == dto.Category.Id);
+
+        await db.Laufbewerbe.AddAsync(new Laufbewerb()
+        {
+            Datum = DateOnly.FromDateTime(DateTime.Now),
+            Name = dto.Name,
+            Ort = dto.Place,
+            Laufkategorie = category,
+            LaufkategorieId = category!.Id,
+            Streckenlänge = dto.Length
+        });
+        await db.SaveChangesAsync();
+        return Results.NoContent();
+    }
+    private static async Task<IResult> DeleteCompetition(ApplicationDataContext db, int id)
+    {
+        var comp = await db.Laufbewerbe.FirstOrDefaultAsync(k => k.Id == id);
+        if (comp == null)
+        {
+            return Results.NotFound();
+        }
+        db.Laufbewerbe.Remove(comp);
+        await db.SaveChangesAsync();
+        return Results.NoContent();
+    }
+    
+    private static async Task<IResult> UpdateCompetition(ApplicationDataContext db, CompetitionDto dto)
+    {
+        var comp = await db.Laufbewerbe.FirstOrDefaultAsync(k => k.Id == dto.Id);
+        if (comp == null)
+        {
+            return Results.NotFound();
+        }
+        
+        var category = await db.Laufkategorien.FirstOrDefaultAsync(c => c.Id == dto.Category.Id);
+        
+        comp.Name = dto.Name;
+        comp.Datum = dto.Date;
+        comp.Laufkategorie = category;
+        comp.LaufkategorieId = category!.Id;
+        comp.Ort = dto.Place;
+        comp.Streckenlänge = dto.Length;
+        
+        await db.SaveChangesAsync();
+        return Results.NoContent();
+    }
 }
 
-// TODO: Add record types for DTOs here (LaufkategorieDto, LaufbewerbDto, CreateOrUpdateLaufbewerbDto, PatchLaufbewerbDto)
+public record CategoryDto(int Id, string Name);
+public record CompetitionDto(
+    int Id,
+    string Name,
+    CategoryDto Category,
+    decimal Length,
+    DateOnly Date,
+    string Place);
+    
+public record CompetitionReqDto(
+    string Name,
+    CategoryDto Category,
+    decimal Length,
+    string Place);
+    
