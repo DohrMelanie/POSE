@@ -347,8 +347,8 @@
             "format": "int32"
           },
           "avgVelocity": {
-            "type": "integer",
-            "format": "int32"
+            "type": "number",
+            "format": "double"
           },
           "goalAchieved": {
             "type": "boolean"

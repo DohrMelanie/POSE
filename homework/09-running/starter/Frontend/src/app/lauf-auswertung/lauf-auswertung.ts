@@ -27,11 +27,9 @@ export class LaufAuswertung implements OnInit{
   protected readonly error = signal<string | null>(null);
   protected readonly evaluation = signal<EvaluationDto | null>(null);
 
-
   async ngOnInit() {
     this.competitions.set(await this.api.invoke(getCompetitions, {}));
   }
-
 
   async onCompChange(event: Event) {
     let value = (event.target as HTMLSelectElement).value;
@@ -54,11 +52,20 @@ export class LaufAuswertung implements OnInit{
 
       this.evaluation.set(await this.api.invoke(computeEvaluation, { body: req}));
     } catch(e: any) {
-      console.log("here");
-      this.error.set(e);
+      this.error.set(e.error);
     }
     this.calculating.set(false);
   }
 
-  
+  getTime(seconds: number) {
+    let minutes = Math.floor(seconds / 60);
+    seconds = seconds % 60;
+
+    if (minutes > 60) {
+      let hours = Math.floor(minutes / 60);
+      minutes = minutes % 60;
+      return hours.toString().padStart(2, '0') + ":" + minutes.toString().padStart(2, '0') + ":" + seconds.toString().padStart(2, '0'); 
+    }
+    return minutes.toString().padStart(2, '0') + ":" + seconds.toString().padStart(2, '0'); 
+  }
 }

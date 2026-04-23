@@ -62,7 +62,7 @@ public static class AuswertungEndpoints
         
         var calculation = new EvaluationDto(
             totalTime, 
-            (int)(participant.Laufbewerb.Streckenlänge / totalTime) * 3600,
+            (participant.Laufbewerb.Streckenlänge / totalTime) * 3600,
             totalTime <= participant.AngestrebteGesamtzeit, 
             splits);
         
@@ -82,7 +82,7 @@ public record ParticipantDto(
     
 public record EvaluationDto(
     int TotalTime,
-    int AvgVelocity,
+    decimal AvgVelocity,
     bool GoalAchieved,
     List<SplitDto> Splits);
     

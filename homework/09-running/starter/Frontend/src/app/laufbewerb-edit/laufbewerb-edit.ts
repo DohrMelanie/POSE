@@ -3,7 +3,7 @@ import { CategoryDto } from './../api/models/category-dto';
 import { Component, computed, inject, input, OnInit, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { form, FormField, maxLength, min, required } from '@angular/forms/signals';
+import { form, FormField, maxLength, min, PathKind, required, SchemaPath } from '@angular/forms/signals';
 import { ApiConfiguration } from '../api/api-configuration';
 import { Api } from '../api/api';
 import { CompetitionDto } from '../api/models';
@@ -48,7 +48,9 @@ export class LaufbewerbEdit implements OnInit{
     maxLength(schema.place, 100, { message: 'Max length is 100 characters' });
     maxLength(schema.name, 100, { message: 'Max length is 100 characters' });
     min(schema.length, 0.01, { message: 'Minimum is 0.01' });
-    // TODO: check for 2 decimal places
+    custom(schema.length, (val) => (val * 100) % 1 === 0, { 
+      message: 'Only 2 decimal places allowed' 
+    });
   });
 
   async ngOnInit() {
@@ -85,3 +87,7 @@ export class LaufbewerbEdit implements OnInit{
     this.comp().category = this.categories().find(c => c.id == parseInt(value))!;
   }
 }
+function custom(length: SchemaPath<number, 1, PathKind.Child>, arg1: (val: any) => boolean, arg2: { message: string; }) {
+  throw new Error('Function not implemented.');
+}
+

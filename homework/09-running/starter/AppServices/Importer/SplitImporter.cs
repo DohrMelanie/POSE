@@ -87,11 +87,11 @@ public class SplitImporter(
 
     private static decimal CalculateSegment(SplitRowData row, Laufbewerb comp)
     {
-        if (comp.Streckenlänge != row.KmNummer || decimal.IsInteger(comp.Streckenlänge))
+        if (row.KmNummer <= comp.Streckenlänge || decimal.IsInteger(comp.Streckenlänge))
         {
             return 1m;
         }
 
-        return comp.Streckenlänge % 1;
+        return row.KmNummer - comp.Streckenlänge;
     }
 }

@@ -38,6 +38,7 @@ export class LaufbewerbList implements OnInit{
 
   async applyFilter() {
     this.loading.set(true);
+    console.log(this.filterCategory());
     try {
       this.competitions.set(await this.api.invoke(getCompetitions, {
         name: this.filterName() ?? undefined,
@@ -48,6 +49,11 @@ export class LaufbewerbList implements OnInit{
     }
 
     this.loading.set(false);
+  }
+
+  applyFilterCategory(event: Event) {
+    let value = (event.target as HTMLSelectElement).value;
+    this.filterCategory.set(this.categories().find(c => c.id == parseInt(value))!);
   }
 
   async disableFilter() {

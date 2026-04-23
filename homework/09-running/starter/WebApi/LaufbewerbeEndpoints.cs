@@ -77,7 +77,12 @@ public static class LaufbewerbeEndpoints
         if (dto.Length < 0.01m)
         {
             return Results.BadRequest("Length too short.");
-        } // todo max 2 decimal places
+        } 
+        
+        if (dto.Length * 100 % 1 != 0)
+        {
+            return Results.BadRequest("Length should only have max. 2 decimal places");
+        }
         
         if (dto.Place.Length > 100)
         {
@@ -125,7 +130,12 @@ public static class LaufbewerbeEndpoints
         if (dto.Length < 0.01m)
         {
             return Results.BadRequest("Length too short.");
-        } // todo max 2 decimal places
+        }
+        
+        if (dto.Length * 100 % 1 != 0)
+        {
+            return Results.BadRequest("Length should only have max. 2 decimal places");
+        }
         
         if (dto.Place.Length > 100)
         {
