@@ -1,0 +1,68 @@
+<div class="container">
+  <h1>Laufbewerbe</h1>
+
+  <div class="toolbar">
+    <a class="primary" [routerLink]="['/laufbewerbe/new']">+ Laufbewerb hinzufügen</a>
+  </div>
+
+  <div class="filters">
+    <div class="filter-field">
+      <label for="name">Name enthält</label>
+      <input id="name" [(ngModel)]="filterName" type="text" placeholder="z.B. Marathon" />
+    </div>
+
+    <div class="filter-field">
+      <label for="laufkategorie">Laufkategorie</label>
+      <select id="laufkategorie" [(ngModel)]="filterCategory">
+        <option value="">(alle)</option>
+        @for (cat of categories(); track cat.id) {
+          <option [value]="cat.id">{{ cat.name }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="filter-actions">
+      <button type="button" (click)="applyFilter()">Filter anwenden</button>
+      <button
+        type="button"
+        (click)="cancelFilter()"
+        [disabled]="filterCategory() == null || filterName() == null"
+      >
+        Filter zurücksetzen
+      </button>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="state">Lade Daten...</div>
+  }
+
+  @if (error() != null) {
+    <div class="state error">{{ error() }}</div>
+  } @else {
+    <div class="table">
+      <div class="h">ID</div>
+      <div class="h">Name</div>
+      <div class="h">Kategorie</div>
+      <div class="h num">Streckenlänge (km)</div>
+      <div class="h">Datum</div>
+      <div class="h">Ort</div>
+      <div class="h">Aktionen</div>
+
+      @for (b of competitions(); track b.id) {
+        <div class="c">{{ b.id }}</div>
+        <div class="c">{{ b.name }}</div>
+        <div class="c">{{ getCategoryName(b.categoryId) }}</div>
+        <div class="c num">{{ b.length | number: '1.2-2' }}</div>
+        <div class="c">{{ b.date }}</div>
+        <div class="c">{{ b.place }}</div>
+        <div class="c actions">
+          <a [routerLink]="['/laufbewerbe', b.id, 'edit']">Ändern</a>
+          <button type="button" class="danger" (click)="deleteCompetition(b.id)">Löschen</button>
+        </div>
+      } @empty {
+        <p>Keine Laufbewerbe gefunden.</p>
+      }
+    </div>
+  }
+</div>

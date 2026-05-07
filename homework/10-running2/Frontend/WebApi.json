@@ -1,0 +1,441 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "WebApi | v1",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/laufkategorien": {
+      "get": {
+        "tags": [
+          "LaufbewerbeEndpoints"
+        ],
+        "operationId": "GetCategories",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CategoryDto"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/laufbewerbe": {
+      "get": {
+        "tags": [
+          "LaufbewerbeEndpoints"
+        ],
+        "operationId": "GetCompetitions",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "categoryId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CompetitionDto"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "LaufbewerbeEndpoints"
+        ],
+        "operationId": "CreateCompetition",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompetitionReqDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "LaufbewerbeEndpoints"
+        ],
+        "operationId": "UpdateCompetition",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompetitionDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/laufbewerbe/{id}": {
+      "get": {
+        "tags": [
+          "LaufbewerbeEndpoints"
+        ],
+        "operationId": "GetCompetitionById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompetitionDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "LaufbewerbeEndpoints"
+        ],
+        "operationId": "DeleteCompetitionById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/laufbewerbe/{compId}/teilnehmer": {
+      "get": {
+        "tags": [
+          "AuswertungEndpoints"
+        ],
+        "operationId": "GetParticipants",
+        "parameters": [
+          {
+            "name": "compId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ParticipantDto"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/laufbewerbe/auswertung": {
+      "post": {
+        "tags": [
+          "AuswertungEndpoints"
+        ],
+        "operationId": "ComputeEvaluation",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ComputeReqDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EvaluationDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CategoryDto": {
+        "required": [
+          "id",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "CompetitionDto": {
+        "required": [
+          "id",
+          "name",
+          "categoryId",
+          "length",
+          "date",
+          "place"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "categoryId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "length": {
+            "type": "number",
+            "format": "double"
+          },
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "place": {
+            "type": "string"
+          }
+        }
+      },
+      "CompetitionReqDto": {
+        "required": [
+          "name",
+          "categoryId",
+          "length",
+          "date",
+          "place"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "categoryId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "length": {
+            "type": "number",
+            "format": "double"
+          },
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "place": {
+            "type": "string"
+          }
+        }
+      },
+      "ComputeReqDto": {
+        "required": [
+          "participantId"
+        ],
+        "type": "object",
+        "properties": {
+          "participantId": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "EvaluationDto": {
+        "required": [
+          "totalTime",
+          "avgTime",
+          "targetReached",
+          "splits"
+        ],
+        "type": "object",
+        "properties": {
+          "totalTime": {
+            "type": "number",
+            "format": "double"
+          },
+          "avgTime": {
+            "type": "number",
+            "format": "double"
+          },
+          "targetReached": {
+            "type": "boolean"
+          },
+          "splits": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SplitEvaluationDto"
+            }
+          }
+        }
+      },
+      "ParticipantDto": {
+        "required": [
+          "startNr",
+          "id",
+          "firstName",
+          "lastName"
+        ],
+        "type": "object",
+        "properties": {
+          "startNr": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          }
+        }
+      },
+      "SplitEvaluationDto": {
+        "required": [
+          "km",
+          "segmentLength",
+          "time",
+          "avgVelocity",
+          "targetReached"
+        ],
+        "type": "object",
+        "properties": {
+          "km": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "segmentLength": {
+            "type": "number",
+            "format": "double"
+          },
+          "time": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "avgVelocity": {
+            "type": "number",
+            "format": "double"
+          },
+          "targetReached": {
+            "type": "boolean"
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "LaufbewerbeEndpoints"
+    },
+    {
+      "name": "AuswertungEndpoints"
+    }
+  ]
+}

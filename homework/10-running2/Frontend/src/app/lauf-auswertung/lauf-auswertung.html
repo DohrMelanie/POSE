@@ -1,0 +1,70 @@
+<div class="container">
+  <h1>Lauf-Auswertung</h1>
+
+  <form>
+    <div class="grid">
+      <div class="field">
+        <label for="laufbewerb">Laufbewerb</label>
+        <select id="laufbewerb" [(ngModel)]="competitionId" (change)="onCompChange()" name="laufbewerb">
+          <option value="">(bitte auswählen)</option>
+          @for (c of competitions(); track c.id) {
+            <option [value]="c.id">{{ c.date + " – " + c.name + " (" + c.place + ") " }}</option>
+          }          
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="teilnehmer">Teilnehmer/in</label>
+        <select id="teilnehmer" [(ngModel)]="participantId" name="teilnehmer">
+          <option value="">(bitte auswählen)</option>
+          @for (t of participants(); track t.id) {
+            <option [value]="t.id">{{ "Nr. " + t.startNr + " – " + t.firstName +" " + t.lastName }}</option>
+          }
+        </select>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button type="button" (click)="calculateEvaluation()" [disabled]="loading() || this.participantId() == null || this.competitionId() == null">
+        {{ loading() ?  "Berechne..." : "Auswerten" }}
+      </button>
+    </div>
+  </form>
+
+  @if (error() != null) {
+   <div class="state error">{{ error() }}</div>
+  } @else if(this.evaluation() != null) {
+    <div class="state totals">
+      <div class="totals-grid">
+        <div class="totals-label">Gesamtzeit</div>
+        <div class="totals-value">{{ this.evaluation()!.totalTime * 1000 | date: this.evaluation()!.totalTime / 3600 > 1 ? 'hh:mm:ss' : 'mm:ss' : 'UTC' }}</div>
+
+        <div class="totals-label">Ø Geschwindigkeit (km/h)</div>
+        <div class="totals-value">{{ this.evaluation()!.avgTime | number:'1.2-2' }}</div>
+
+        <div class="totals-label">Ziel erreicht</div>
+        <div class="totals-value" [class.ziel-erreicht]="this.evaluation()?.targetReached" [class.ziel-nicht-erreicht]="!this.evaluation()?.targetReached">
+          {{ this.evaluation()?.targetReached ? "Ja ✓" : "Nein ✗" }}
+        </div>
+      </div>
+    </div>
+    <div class="table">
+      <div class="h num">km</div>
+      <div class="h num">Länge (km)</div>
+      <div class="h">Zeit</div>
+      <div class="h num">Ø Tempo (km/h)</div>
+      <div class="h">Bewertung</div>
+
+      @for (r of this.evaluation()?.splits; track r.km) {
+        <div class="c num">{{ r.km }}</div>
+        <div class="c num">{{ r.segmentLength | number:'1.2-2' }}</div>
+        <div class="c">{{ r.time * 1000 | date: r.time / 3600 > 1 ? 'hh:mm:ss' : 'mm:ss' : 'UTC' }}</div>
+        <div class="c num">{{ r.avgVelocity | number:'1.2-2' }}</div>
+        <div class="c" [class.unter-ziel]="r.targetReached" [class.ueber-ziel]="!r.targetReached">
+          {{ r.targetReached ? "✓ Im Soll" : "✗ Unter Soll" }}
+        </div>        
+      }
+
+    </div>
+  }  
+</div>

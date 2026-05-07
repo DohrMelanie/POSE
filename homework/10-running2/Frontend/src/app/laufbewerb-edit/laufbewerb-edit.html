@@ -1,0 +1,104 @@
+<div class="container">
+  <h1>{{ id == null ? 'Laufbewerb hinzufügen' : 'Laufbewerb ändern' }}</h1>
+
+  @if (loading()) {
+    <div class="state">Lade Daten...</div>
+  } @else {
+    <form>
+      <div class="grid">
+        <div class="field">
+          <label for="name">Name</label>
+          <input
+            id="name"
+            type="text"
+            [formField]="addForm.name"
+            [class.invalid]="addForm.name().touched() && addForm.name().invalid()"
+          />
+          @if (addForm.name().touched() && addForm.name().invalid()) {
+            <div class="error">
+              @for (e of addForm.name().errors(); track e) {
+                <div>{{ e.message }}</div>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="field">
+          <label for="laufkategorieId">Laufkategorie</label>
+          <select
+            id="laufkategorieId"
+            (change)="onCategoryChange($event)"
+            [class.invalid]="addForm.categoryId().touched() && addForm.categoryId().invalid()"
+          >
+            @for (c of categories(); track c.id) {
+              <option [value]="c.id">{{ c.name }}</option>
+            }
+          </select>
+        </div>  
+
+        <div class="field">
+          <label for="streckenlänge">Streckenlänge (km)</label>
+          <input
+            id="streckenlänge"
+            type="number"
+            step="0.01"
+            [formField]="addForm.length"
+            [class.invalid]="addForm.length().touched() && addForm.length().invalid()"
+          />
+          @if (addForm.length().touched() && addForm.length().invalid()) {
+            <div class="error">
+              @for (e of addForm.length().errors(); track e) {
+                <div>{{ e.message }}</div>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="field">
+          <label for="datum">Datum</label>
+          <input
+            id="datum"
+            type="date"
+            [formField]="addForm.date"
+            [class.invalid]="addForm.date().touched() && addForm.date().invalid()"
+          />
+          @if (addForm.date().touched() && addForm.date().invalid()) {
+            <div class="error">
+              @for (e of addForm.date().errors(); track e) {
+                <div>{{ e.message }}</div>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="field">
+          <label for="ort">Ort</label>
+          <input
+            id="ort"
+            type="text"
+            [formField]="addForm.place"
+            [class.invalid]="addForm.place().touched() && addForm.place().invalid()"
+          />
+          @if (addForm.place().touched() && addForm.place().invalid()) {
+            <div class="error">
+              @for (e of addForm.place().errors(); track e) {
+                <div>{{ e.message }}</div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="actions">
+        <button type="button" [disabled]="saving()" (click)="save()">
+          {{ saving() ? 'Speichere...' : 'Speichern' }}
+        </button>
+        <button (click)="cancel()" type="button" [disabled]="saving()">Abbrechen</button>
+      </div>
+    </form>
+  }
+
+  @if (error()) {
+    <div class="state error">{{ error() }}</div>
+  }
+</div>
